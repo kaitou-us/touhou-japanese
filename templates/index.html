@@ -2,7 +2,11 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a0a0a">
+    <meta name="description" content="幻想郷 言霊修行帳 - 东方Project日语学习平台">
     <title>幻想郷 言霊修行帳 — Touhou Japanese Learning</title>
     
     <!-- 样式文件 -->
@@ -142,5 +146,64 @@
     <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
     <script src="{{ url_for('static', filename='js/panels.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+    <!-- 移动端优化脚本 -->
+    <script>
+    (function() {
+        var isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            function setVH() {
+                var vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', vh + 'px');
+            }
+            setVH();
+            window.addEventListener('resize', setVH);
+            window.addEventListener('orientationchange', function() {
+                setTimeout(setVH, 100);
+            });
+            
+            document.addEventListener('dblclick', function(e) {
+                if (e.target.tagName === 'BUTTON' || 
+                    e.target.closest('.panel') ||
+                    e.target.closest('.danmaku-word-chip')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            document.addEventListener('touchstart', function() {}, { passive: true });
+            
+            var overlay = document.getElementById('modalOverlay');
+            if (overlay) {
+                var observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.target.classList.contains('active')) {
+                            document.body.style.overflow = 'hidden';
+                            document.body.style.position = 'fixed';
+                            document.body.style.width = '100%';
+                        } else {
+                            document.body.style.overflow = '';
+                            document.body.style.position = '';
+                            document.body.style.width = '';
+                        }
+                    });
+                });
+                observer.observe(overlay, {
+                    attributes: true,
+                    attributeFilter: ['class']
+                });
+            }
+            
+            var quickBar = document.querySelector('.quick-bar');
+            if (quickBar) {
+                var safeAreaBottom = getComputedStyle(document.documentElement)
+                    .getPropertyValue('env(safe-area-inset-bottom)');
+                if (safeAreaBottom) {
+                    quickBar.style.paddingBottom = 'calc(12px + ' + safeAreaBottom + ')';
+                }
+            }
+        }
+    })();
+    </script>
 </body>
 </html>

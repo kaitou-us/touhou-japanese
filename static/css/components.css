@@ -677,3 +677,59 @@
         max-height: 90vh;
     }
 }
+/* ==========================================
+   移动端触摸优化
+   ========================================== */
+
+@media (hover: none) and (pointer: coarse) {
+    /* 触摸设备专属样式 */
+    
+    /* 增大点击区域 */
+    .danmaku-word-chip {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .panel {
+        -webkit-tap-highlight-color: rgba(212, 165, 116, 0.15);
+    }
+    
+    /* 点击反馈 */
+    .panel:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+    
+    .btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+    
+    .danmaku-word-chip:active {
+        transform: scale(0.9);
+        transition: transform 0.1s ease;
+    }
+    
+    /* 移除悬停效果（移动端无悬停） */
+    .panel:hover {
+        transform: none;
+    }
+    
+    /* 滚动优化 */
+    .modal-container {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+    
+    /* 防止文字选中 */
+    .panel, .btn, .danmaku-word-chip {
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    
+    /* 输入框缩放优化 */
+    .duel-spell-input {
+        font-size: 16px; /* 防止 iOS 自动缩放 */
+    }
+}

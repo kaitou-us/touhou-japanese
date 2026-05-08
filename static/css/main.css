@@ -548,3 +548,366 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--color-gold-dark);
 }
+/* ==========================================
+   移动端优化样式
+   ========================================== */
+
+/* 移动端基础调整 */
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+        cursor: auto;
+    }
+    
+    /* 禁用自定义光标（移动端无效且影响性能） */
+    * {
+        cursor: auto !important;
+    }
+    
+    .main-container {
+        padding: 60px 12px 100px;
+    }
+    
+    /* 导航栏 */
+    .top-nav {
+        padding: 4px 0;
+    }
+    
+    .nav-container {
+        padding: 8px 12px;
+    }
+    
+    .brand-text {
+        font-size: 0.9em;
+    }
+    
+    .nav-clock {
+        display: none;
+    }
+    
+    /* 英雄区域 */
+    .hero-section {
+        padding: 30px 10px 20px;
+    }
+    
+    .hero-badge {
+        font-size: 0.7em;
+        padding: 4px 12px;
+    }
+    
+    .title-jp {
+        font-size: 2em;
+    }
+    
+    .title-divider {
+        display: none;
+    }
+    
+    .title-sub {
+        font-size: 1.3em;
+        display: block;
+        margin-top: 5px;
+    }
+    
+    .hero-description {
+        font-size: 0.85em;
+        padding: 0 10px;
+    }
+    
+    /* 面板网格 - 单列 */
+    .panels-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 10px 0;
+    }
+    
+    .panel.featured {
+        grid-column: span 1;
+    }
+    
+    /* 面板 */
+    .panel {
+        border-width: 1.5px;
+        min-height: auto;
+        -webkit-tap-highlight-color: rgba(212, 165, 116, 0.1);
+    }
+    
+    .panel-header {
+        padding: 14px 14px 10px;
+        gap: 10px;
+    }
+    
+    .panel-icon-wrapper {
+        width: 36px;
+        height: 36px;
+        font-size: 1.3em;
+    }
+    
+    .panel-title {
+        font-size: 1em;
+    }
+    
+    .panel-body {
+        padding: 12px 14px 14px;
+        font-size: 0.85em;
+    }
+    
+    .panel-body .preview-jp {
+        font-size: 0.95em;
+    }
+    
+    /* 弹窗 - 全屏显示 */
+    .modal-overlay {
+        align-items: flex-end;
+    }
+    
+    .modal-container {
+        width: 100%;
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 16px 16px 0 0;
+        margin: 0;
+        border: 2px solid var(--border-primary);
+    }
+    
+    .modal-close-btn {
+        top: 10px;
+        right: 12px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+    }
+    
+    .modal-close-btn .close-text {
+        display: none;
+    }
+    
+    .modal-header {
+        padding: 20px 16px 0;
+    }
+    
+    .modal-body {
+        padding: 12px 16px 20px;
+    }
+    
+    .modal-footer {
+        padding: 12px 16px 16px;
+    }
+    
+    /* 符卡 */
+    .ofuda-card {
+        padding: 18px;
+        margin: 10px 0;
+    }
+    
+    .ofuda-card .card-word {
+        font-size: 2.2em;
+    }
+    
+    .ofuda-card .card-reading {
+        font-size: 1em;
+    }
+    
+    /* 商店物品 */
+    .shop-item {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px;
+    }
+    
+    .shop-item .item-emoji {
+        font-size: 1.8em;
+        width: 36px;
+    }
+    
+    .shop-item .item-price {
+        min-width: auto;
+    }
+    
+    /* 对决 */
+    .duel-arena {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .duel-vs {
+        font-size: 1.8em;
+    }
+    
+    .duel-fighter .fighter-avatar {
+        font-size: 3em;
+    }
+    
+    .duel-spell-input {
+        width: 100%;
+        font-size: 0.9em;
+    }
+    
+    /* 弹幕 */
+    .danmaku-zone {
+        padding: 12px;
+    }
+    
+    .danmaku-words-container {
+        gap: 8px;
+        padding: 10px;
+    }
+    
+    .danmaku-word-chip {
+        padding: 8px 14px;
+        font-size: 0.95em;
+        border-radius: 16px;
+    }
+    
+    .danmaku-assembled-area {
+        min-height: 44px;
+        padding: 10px;
+    }
+    
+    /* 罗盘 */
+    .compass-diagram {
+        padding: 20px;
+    }
+    
+    .compass-pointer {
+        font-size: 2.5em;
+    }
+    
+    .compass-formula {
+        font-size: 0.95em;
+    }
+    
+    /* 神社 */
+    .shrine-gate {
+        font-size: 4em;
+    }
+    
+    /* 按钮 */
+    .btn {
+        padding: 10px 18px;
+        font-size: 0.9em;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-lg {
+        padding: 12px 24px;
+        font-size: 1em;
+    }
+    
+    /* 底部快捷栏 */
+    .quick-bar {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transform: none;
+        border-radius: 16px 16px 0 0;
+        padding: 8px 4px 12px;
+        background: rgba(10, 5, 5, 0.95);
+        border-bottom: none;
+    }
+    
+    .quick-bar-inner {
+        justify-content: space-around;
+        gap: 0;
+    }
+    
+    .quick-btn {
+        padding: 6px 2px;
+        font-size: 0.7em;
+        flex-direction: column;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        border-radius: 12px;
+    }
+    
+    .quick-btn span {
+        font-size: 1.4em;
+        display: block;
+    }
+    
+    /* 回到顶部按钮 */
+    .back-to-top {
+        bottom: 90px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        font-size: 1em;
+    }
+    
+    /* Toast 通知 */
+    .toast-container {
+        top: 60px;
+        right: 10px;
+        left: 10px;
+    }
+    
+    .toast {
+        max-width: 100%;
+        font-size: 0.8em;
+        padding: 10px 14px;
+    }
+    
+    /* 页脚 */
+    .site-footer {
+        padding: 20px 10px 100px;
+    }
+    
+    .footer-content p {
+        font-size: 0.75em;
+    }
+    
+    /* 滚动条 */
+    ::-webkit-scrollbar {
+        width: 3px;
+    }
+}
+
+/* 小屏手机 (iPhone SE, 320px) */
+@media (max-width: 380px) {
+    .title-jp {
+        font-size: 1.6em;
+    }
+    
+    .title-sub {
+        font-size: 1.1em;
+    }
+    
+    .panel-title {
+        font-size: 0.9em;
+    }
+    
+    .danmaku-word-chip {
+        padding: 6px 10px;
+        font-size: 0.85em;
+    }
+    
+    .ofuda-card .card-word {
+        font-size: 1.8em;
+    }
+}
+
+/* 平板 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .panels-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .panel.featured {
+        grid-column: span 2;
+    }
+    
+    .modal-container {
+        width: 85%;
+    }
+}
