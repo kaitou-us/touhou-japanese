@@ -1,0 +1,374 @@
+/* ==========================================
+   欢迎邀请函样式 - Welcome Invitation
+   ========================================== */
+
+.welcome-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* 粉色邀请函信封 */
+.invitation-envelope {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    background: linear-gradient(135deg, #ffe0ec 0%, #ffb8d0 30%, #f8a4c8 60%, #ffd6e8 100%);
+    border-radius: 20px;
+    box-shadow: 
+        0 20px 60px rgba(255, 100, 150, 0.4),
+        0 0 100px rgba(255, 150, 180, 0.2),
+        inset 0 0 30px rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+    animation: envelopeAppear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 信封顶部装饰带 */
+.envelope-seal {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #ff6b8a, #e91e63);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    box-shadow: 0 5px 20px rgba(233, 30, 99, 0.5);
+    z-index: 2;
+    animation: sealBounce 2s ease-in-out infinite;
+}
+
+/* 信封内容 */
+.envelope-content {
+    padding: 40px 30px 30px;
+    text-align: center;
+}
+
+.envelope-header {
+    margin-bottom: 20px;
+}
+
+.envelope-title {
+    font-family: var(--font-jp, serif);
+    font-size: 1.5em;
+    color: #6b2040;
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+}
+
+.envelope-subtitle {
+    font-size: 0.9em;
+    color: #a04060;
+    letter-spacing: 0.15em;
+}
+
+.envelope-decoration {
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #e91e63, transparent);
+    margin: 15px auto;
+}
+
+/* 步骤区域 */
+.welcome-step {
+    display: none;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.welcome-step.active {
+    display: block;
+}
+
+/* 步骤1：抽取角色 */
+.character-draw-area {
+    padding: 20px 0;
+}
+
+.draw-button {
+    display: inline-block;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, #ff6b8a, #e91e63);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.1em;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    font-family: inherit;
+    box-shadow: 0 8px 25px rgba(233, 30, 99, 0.4);
+    transition: all 0.3s ease;
+    animation: gentleFloat 3s ease-in-out infinite;
+}
+
+.draw-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(233, 30, 99, 0.6);
+}
+
+.draw-button:active {
+    transform: scale(0.95);
+}
+
+.draw-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    animation: none;
+}
+
+/* 角色展示卡片 */
+.drawn-character-card {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 15px 0;
+    border: 2px solid rgba(233, 30, 99, 0.3);
+    animation: scaleIn 0.5s ease-out;
+}
+
+.character-emoji-display {
+    font-size: 4em;
+    display: block;
+    margin-bottom: 10px;
+    animation: gentleFloat 2s ease-in-out infinite;
+}
+
+.character-name-display {
+    font-size: 1.4em;
+    color: #6b2040;
+    font-weight: bold;
+    font-family: var(--font-jp, serif);
+}
+
+.character-title-display {
+    font-size: 0.9em;
+    color: #a04060;
+    margin: 5px 0;
+}
+
+.character-rarity-badge {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 15px;
+    font-size: 0.85em;
+    letter-spacing: 0.2em;
+    margin: 8px 0;
+}
+
+.rarity-SSR-badge {
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    color: #5c3d00;
+    font-weight: bold;
+}
+
+.rarity-SR-badge {
+    background: linear-gradient(135deg, #ff6b8a, #e91e63);
+    color: white;
+}
+
+.rarity-R-badge {
+    background: #a0c0e0;
+    color: #304050;
+}
+
+.character-desc {
+    color: #6b4050;
+    font-size: 0.9em;
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+/* 名称输入 */
+.name-input-group {
+    margin: 15px 0;
+}
+
+.name-input {
+    width: 80%;
+    padding: 12px 16px;
+    border: 2px solid rgba(233, 30, 99, 0.3);
+    border-radius: 25px;
+    font-size: 1em;
+    text-align: center;
+    font-family: inherit;
+    background: rgba(255, 255, 255, 0.7);
+    color: #6b2040;
+    transition: all 0.3s ease;
+}
+
+.name-input:focus {
+    outline: none;
+    border-color: #e91e63;
+    box-shadow: 0 0 20px rgba(233, 30, 99, 0.2);
+}
+
+.name-input::placeholder {
+    color: #c090a0;
+}
+
+/* 确认按钮 */
+.confirm-button {
+    display: inline-block;
+    padding: 14px 36px;
+    background: linear-gradient(135deg, #e91e63, #c2185b);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.05em;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    font-family: inherit;
+    box-shadow: 0 6px 20px rgba(233, 30, 99, 0.3);
+    transition: all 0.3s ease;
+    margin: 8px;
+}
+
+.confirm-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(233, 30, 99, 0.5);
+}
+
+.confirm-button.secondary {
+    background: rgba(255, 255, 255, 0.6);
+    color: #6b2040;
+    border: 2px solid rgba(233, 30, 99, 0.3);
+    box-shadow: none;
+}
+
+/* 重新抽取按钮 */
+.redraw-button {
+    display: inline-block;
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.5);
+    color: #6b2040;
+    border: 2px solid rgba(233, 30, 99, 0.3);
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.redraw-button:hover {
+    background: rgba(233, 30, 99, 0.1);
+    border-color: #e91e63;
+}
+
+/* 步骤2：确认信息 */
+.welcome-summary {
+    text-align: left;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    margin: 15px 0;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px dashed rgba(233, 30, 99, 0.2);
+    color: #6b2040;
+    font-size: 0.9em;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-label {
+    color: #a04060;
+}
+
+.summary-value {
+    font-weight: bold;
+}
+
+/* 加载动画 */
+.drawing-animation {
+    padding: 30px;
+}
+
+.drawing-text {
+    color: #6b2040;
+    font-size: 1.1em;
+    margin: 10px 0;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+/* 花瓣飘落 */
+.petal-particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+    font-size: 1.5em;
+    animation: petalFall linear forwards;
+}
+
+@keyframes envelopeAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes sealBounce {
+    0%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    50% {
+        transform: translateX(-50%) translateY(-8px);
+    }
+}
+
+@keyframes petalFall {
+    0% {
+        opacity: 1;
+        transform: translateY(-10vh) rotate(0deg) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(110vh) rotate(720deg) scale(0.2);
+    }
+}
+
+/* 移动端适配 */
+@media (max-width: 600px) {
+    .invitation-envelope {
+        width: 95%;
+        max-width: 400px;
+    }
+    
+    .envelope-content {
+        padding: 35px 20px 25px;
+    }
+    
+    .envelope-title {
+        font-size: 1.3em;
+    }
+    
+    .draw-button {
+        padding: 14px 30px;
+        font-size: 1em;
+    }
+    
+    .character-emoji-display {
+        font-size: 3em;
+    }
+}

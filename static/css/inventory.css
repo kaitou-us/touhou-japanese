@@ -1,0 +1,385 @@
+/* ==========================================
+   背包系统样式 - Inventory System
+   ========================================== */
+
+/* 用户状态栏 */
+.user-status-bar {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(180, 40, 40, 0.2);
+    border: 2px solid var(--border-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8em;
+    flex-shrink: 0;
+}
+
+.user-info {
+    flex: 1;
+    min-width: 150px;
+}
+
+.user-name {
+    color: var(--text-gold);
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.user-title {
+    color: var(--text-muted);
+    font-size: 0.85em;
+}
+
+.user-level {
+    color: var(--color-gold);
+    font-size: 0.9em;
+}
+
+.exp-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 3px;
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.exp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-gold-dark), var(--color-gold));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+/* 货币展示 */
+.currencies-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.currency-item {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+}
+
+.currency-icon {
+    font-size: 1.2em;
+}
+
+.currency-name {
+    color: var(--text-muted);
+    font-size: 0.8em;
+}
+
+.currency-amount {
+    color: var(--text-gold);
+    font-weight: bold;
+}
+
+/* 背包标签切换 */
+.inventory-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0;
+}
+
+.inventory-tab {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: var(--font-cn);
+    font-size: 0.9em;
+    letter-spacing: 0.05em;
+    transition: all var(--transition-fast);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    border-bottom: none;
+}
+
+.inventory-tab:hover {
+    color: var(--text-gold);
+    background: rgba(180, 40, 40, 0.1);
+}
+
+.inventory-tab.active {
+    color: var(--text-gold);
+    background: rgba(180, 40, 40, 0.15);
+    border-color: var(--border-primary);
+    border-bottom: 2px solid var(--color-gold);
+}
+
+/* 符卡网格 */
+.spellcards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+.spellcard-item {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.spellcard-item:hover {
+    border-color: var(--color-gold);
+    box-shadow: var(--shadow-red-glow);
+    transform: translateY(-2px);
+}
+
+.spellcard-item.equipped {
+    border-color: var(--color-gold);
+    box-shadow: 0 0 20px rgba(212, 165, 116, 0.3);
+}
+
+.spellcard-item.equipped::before {
+    content: '装备中';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--color-gold);
+    color: var(--bg-dark);
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 0.7em;
+    letter-spacing: 0.1em;
+}
+
+.spellcard-rarity {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7em;
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+}
+
+.rarity-SSR {
+    background: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+    border: 1px solid #ffd700;
+}
+
+.rarity-SR {
+    background: rgba(192, 57, 43, 0.2);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+}
+
+.rarity-R {
+    background: rgba(139, 69, 19, 0.2);
+    color: var(--color-gold-dark);
+    border: 1px solid var(--color-gold-dark);
+}
+
+.spellcard-name {
+    color: var(--text-gold);
+    font-size: 1.1em;
+    font-family: var(--font-jp);
+    margin-bottom: 4px;
+}
+
+.spellcard-type {
+    color: var(--text-muted);
+    font-size: 0.8em;
+    margin-bottom: 8px;
+}
+
+.spellcard-power {
+    color: var(--color-primary);
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.spellcard-desc {
+    color: var(--text-secondary);
+    font-size: 0.85em;
+    margin-top: 8px;
+    line-height: 1.5;
+}
+
+.spellcard-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+/* 道具列表 */
+.items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.item-row {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all var(--transition-fast);
+}
+
+.item-row:hover {
+    border-color: var(--border-primary);
+    background: rgba(180, 40, 40, 0.05);
+}
+
+.item-icon-large {
+    font-size: 2.2em;
+    width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.item-name-text {
+    color: var(--text-gold);
+    font-size: 1em;
+}
+
+.item-quantity {
+    background: rgba(0,0,0,0.3);
+    color: var(--text-muted);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8em;
+}
+
+.item-effect {
+    color: var(--text-secondary);
+    font-size: 0.85em;
+    margin-bottom: 2px;
+}
+
+.item-desc-text {
+    color: var(--text-muted);
+    font-size: 0.8em;
+}
+
+.item-type-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7em;
+    letter-spacing: 0.05em;
+}
+
+.type-consumable {
+    background: rgba(40, 140, 40, 0.2);
+    color: #5a5;
+    border: 1px solid #5a5;
+}
+
+.type-material {
+    background: rgba(100, 100, 200, 0.2);
+    color: #88a;
+    border: 1px solid #88a;
+}
+
+/* 装备栏 */
+.equipment-slot {
+    background: var(--bg-panel);
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all var(--transition-fast);
+}
+
+.equipment-slot.filled {
+    border-style: solid;
+    border-color: var(--border-gold);
+    background: rgba(180, 40, 40, 0.05);
+}
+
+.equipment-slot .slot-label {
+    color: var(--text-muted);
+    font-size: 0.85em;
+}
+
+.equipment-slot.filled .slot-icon {
+    font-size: 2.5em;
+}
+
+.equipment-slot.filled .slot-name {
+    color: var(--text-gold);
+}
+
+/* ============ 响应式 ============ */
+@media (max-width: 768px) {
+    .spellcards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .user-status-bar {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+    
+    .currencies-row {
+        width: 100%;
+        justify-content: space-around;
+    }
+    
+    .currency-item {
+        padding: 4px 10px;
+        font-size: 0.8em;
+    }
+    
+    .inventory-tab {
+        padding: 8px 12px;
+        font-size: 0.8em;
+    }
+    
+    .item-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}

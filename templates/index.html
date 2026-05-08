@@ -9,16 +9,62 @@
     <meta name="description" content="幻想郷 言霊修行帳 - 东方Project日语学习平台">
     <title>幻想郷 言霊修行帳 — Touhou Japanese Learning</title>
     
-    <!-- 样式文件 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inventory.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
     
-    <!-- 预加载字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
+
+    <!-- ==================== 欢迎邀请函覆盖层 ==================== -->
+    <div id="welcomeOverlay" style="display: block;">
+        <div class="welcome-overlay" id="welcomeScreen">
+            <div class="invitation-envelope">
+                <div class="envelope-seal">💌</div>
+                <div class="envelope-content" id="welcomeContent">
+                    
+                    <!-- 步骤1：抽取角色 -->
+                    <div class="welcome-step active" id="stepDraw">
+                        <div class="envelope-header">
+                            <div class="envelope-title">✨ 幻想郷へようこそ ✨</div>
+                            <div class="envelope-subtitle">— 欢迎来到幻想乡 —</div>
+                        </div>
+                        <div class="envelope-decoration"></div>
+                        <p style="color:#6b2040;font-size:0.95em;margin:10px 0;">
+                            你被一股神秘的力量吸引到了幻想乡<br>
+                            在这里，你将化身为一位角色<br>
+                            开始你的言灵修行之旅
+                        </p>
+                        <div class="character-draw-area">
+                            <div id="drawResult"></div>
+                            <button class="draw-button" id="drawBtn" onclick="drawCharacter()">
+                                🎴 抽取你的角色
+                            </button>
+                            <p style="color:#a04060;font-size:0.8em;margin-top:8px;">
+                                点击抽取，命运将为你选择
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- 步骤2：确认信息 -->
+                    <div class="welcome-step" id="stepConfirm">
+                        <div class="envelope-header">
+                            <div class="envelope-title">🌸 确认你的身份 🌸</div>
+                            <div class="envelope-subtitle">— 这就是你在幻想乡的化身 —</div>
+                        </div>
+                        <div class="envelope-decoration"></div>
+                        <div id="confirmContent"></div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 全局背景效果层 -->
     <div class="bg-layer">
         <div class="bg-stars"></div>
@@ -26,10 +72,9 @@
         <div class="bg-mist"></div>
     </div>
 
-    <!-- 粒子系统容器 -->
     <div id="particles-container"></div>
 
-    <!-- ==================== 顶部导航栏 ==================== -->
+    <!-- 顶部导航栏 -->
     <nav class="top-nav">
         <div class="nav-container">
             <div class="nav-brand">
@@ -44,9 +89,8 @@
         </div>
     </nav>
 
-    <!-- ==================== 主容器 ==================== -->
+    <!-- 主容器 -->
     <div class="main-container">
-        <!-- 英雄区域 -->
         <header class="hero-section">
             <div class="hero-content">
                 <div class="hero-badge">東方Project × 日本語学習</div>
@@ -60,21 +104,39 @@
                     在幻想乡的引导下，掌握日语的言灵之力<br>
                     六个修行板块，带你走进不一样的学习之旅
                 </p>
-                <div class="hero-scroll-hint">
-                    <span>▼ 开始修行 ▼</span>
-                </div>
             </div>
         </header>
 
-        <!-- 六大板块网格 -->
+        <!-- 背包入口 -->
+        <div class="user-status-bar" style="cursor:pointer; margin-bottom:24px;" onclick="openInventory()">
+            <div class="user-avatar">🧙‍♀️</div>
+            <div class="user-info">
+                <div class="user-name" id="headerUsername">未登录</div>
+                <div class="user-title" id="headerTitle">请先抽取角色</div>
+                <div class="exp-bar">
+                    <div class="exp-fill" id="headerExpBar" style="width:0%"></div>
+                </div>
+            </div>
+            <div class="currencies-row">
+                <div class="currency-item">
+                    <span class="currency-icon">💎</span>
+                    <span class="currency-amount" id="headerRei">0</span>
+                </div>
+                <div class="currency-item">
+                    <span class="currency-icon">💰</span>
+                    <span class="currency-amount" id="headerSaisen">0</span>
+                </div>
+            </div>
+            <div style="color:var(--text-muted);font-size:0.8em;">点击打开背包 →</div>
+        </div>
+
+        <!-- 六大板块 -->
         <section class="panels-section" id="panelsSection">
             <div class="section-header">
                 <h2 class="section-title">◆ 六大修行板块 ◆</h2>
                 <p class="section-subtitle">选择一个板块，开始你的言灵修行之旅</p>
             </div>
-            
             <div class="panels-grid" id="panelsGrid">
-                <!-- 骨架屏加载动画 -->
                 <div class="panel-skeleton" style="--delay: 0s"></div>
                 <div class="panel-skeleton" style="--delay: 0.1s"></div>
                 <div class="panel-skeleton" style="--delay: 0.2s"></div>
@@ -84,7 +146,6 @@
             </div>
         </section>
 
-        <!-- 页脚 -->
         <footer class="site-footer">
             <div class="footer-content">
                 <p>🏮 幻想郷 言霊修行帳 v1.0</p>
@@ -93,7 +154,7 @@
         </footer>
     </div>
 
-    <!-- ==================== 全局弹窗系统 ==================== -->
+    <!-- 弹窗系统 -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-container" id="modalContainer">
             <button class="modal-close-btn" id="modalCloseBtn">
@@ -111,47 +172,31 @@
         </div>
     </div>
 
-    <!-- ==================== 通知提示系统 ==================== -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ==================== 底部快捷栏 ==================== -->
+    <!-- 底部快捷栏 -->
     <div class="quick-bar" id="quickBar">
         <div class="quick-bar-inner">
-            <button class="quick-btn" onclick="quickAction('card')" title="快速抽卡">
-                <span>🎴</span> 抽卡
-            </button>
-            <button class="quick-btn" onclick="quickAction('duel')" title="符卡对决">
-                <span>⚔️</span> 对决
-            </button>
-            <button class="quick-btn" onclick="quickAction('shop')" title="杂货铺">
-                <span>🏮</span> 商店
-            </button>
-            <button class="quick-btn" onclick="quickAction('grammar')" title="文法罗盘">
-                <span>🧭</span> 文法
-            </button>
-            <button class="quick-btn" onclick="quickAction('danmaku')" title="弹幕洗练">
-                <span>💥</span> 弹幕
-            </button>
-            <button class="quick-btn" onclick="quickAction('culture')" title="神社">
-                <span>⛩️</span> 神社
-            </button>
+            <button class="quick-btn" onclick="quickAction('card')"><span>🎴</span> 抽卡</button>
+            <button class="quick-btn" onclick="quickAction('duel')"><span>⚔️</span> 对决</button>
+            <button class="quick-btn" onclick="quickAction('shop')"><span>🏮</span> 商店</button>
+            <button class="quick-btn" onclick="quickAction('grammar')"><span>🧭</span> 文法</button>
+            <button class="quick-btn" onclick="quickAction('danmaku')"><span>💥</span> 弹幕</button>
+            <button class="quick-btn" onclick="quickAction('culture')"><span>⛩️</span> 神社</button>
         </div>
     </div>
 
-    <!-- 回到顶部按钮 -->
     <button class="back-to-top" id="backToTop" title="回到顶部">▲</button>
 
-    <!-- JavaScript 文件 -->
     <script src="{{ url_for('static', filename='js/api.js') }}"></script>
     <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
     <script src="{{ url_for('static', filename='js/panels.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/inventory.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 
-    <!-- 移动端优化脚本 -->
     <script>
     (function() {
         var isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
-        
         if (isMobile) {
             function setVH() {
                 var vh = window.innerHeight * 0.01;
@@ -159,19 +204,7 @@
             }
             setVH();
             window.addEventListener('resize', setVH);
-            window.addEventListener('orientationchange', function() {
-                setTimeout(setVH, 100);
-            });
-            
-            document.addEventListener('dblclick', function(e) {
-                if (e.target.tagName === 'BUTTON' || 
-                    e.target.closest('.panel') ||
-                    e.target.closest('.danmaku-word-chip')) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-            
-            document.addEventListener('touchstart', function() {}, { passive: true });
+            window.addEventListener('orientationchange', function() { setTimeout(setVH, 100); });
             
             var overlay = document.getElementById('modalOverlay');
             if (overlay) {
@@ -179,28 +212,12 @@
                     mutations.forEach(function(mutation) {
                         if (mutation.target.classList.contains('active')) {
                             document.body.style.overflow = 'hidden';
-                            document.body.style.position = 'fixed';
-                            document.body.style.width = '100%';
                         } else {
                             document.body.style.overflow = '';
-                            document.body.style.position = '';
-                            document.body.style.width = '';
                         }
                     });
                 });
-                observer.observe(overlay, {
-                    attributes: true,
-                    attributeFilter: ['class']
-                });
-            }
-            
-            var quickBar = document.querySelector('.quick-bar');
-            if (quickBar) {
-                var safeAreaBottom = getComputedStyle(document.documentElement)
-                    .getPropertyValue('env(safe-area-inset-bottom)');
-                if (safeAreaBottom) {
-                    quickBar.style.paddingBottom = 'calc(12px + ' + safeAreaBottom + ')';
-                }
+                observer.observe(overlay, { attributes: true, attributeFilter: ['class'] });
             }
         }
     })();
