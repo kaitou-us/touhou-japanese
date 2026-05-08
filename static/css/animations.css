@@ -1,0 +1,206 @@
+/* ==========================================
+   幻想郷 言霊修行帳 - 动画样式表
+   ========================================== */
+
+/* ============ 关键帧动画 ============ */
+
+/* 浮动 */
+@keyframes gentleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* 弹跳箭头 */
+@keyframes bounceArrow {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50% { transform: translateY(10px); opacity: 1; }
+}
+
+/* 脉冲 */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* 旋转 */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 骨架屏脉冲 */
+@keyframes skeletonPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* 骨架屏闪光 */
+@keyframes skeletonShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* 淡入上浮 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 淡入 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 缩放进入 */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* 从右侧滑入 */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 淡出 */
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* 粒子上升 */
+@keyframes floatUp {
+    0% {
+        transform: translateY(100vh) rotate(0deg) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.7;
+        transform: translateY(90vh) rotate(30deg) scale(1);
+    }
+    90% {
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateY(-10vh) rotate(720deg) scale(0.3);
+        opacity: 0;
+    }
+}
+
+/* 参拜鞠躬 */
+@keyframes bow {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-30deg); }
+    50% { transform: rotate(0); }
+    75% { transform: rotate(-30deg); }
+}
+
+/* 符卡翻转 */
+@keyframes cardFlip {
+    0% { transform: rotateY(0); }
+    50% { transform: rotateY(90deg); }
+    100% { transform: rotateY(0); }
+}
+
+/* 弹幕飞行 */
+@keyframes danmakuFly {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+        transform: translate(var(--fly-x), var(--fly-y)) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(var(--fly-x) * 3), calc(var(--fly-y) * 3)) scale(0.5);
+    }
+}
+
+/* 洗练闪光 */
+@keyframes refinementFlash {
+    0% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0.5); }
+    50% { box-shadow: 0 0 30px 10px rgba(212, 165, 116, 0.3); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0); }
+}
+
+/* 灵力波动 */
+@keyframes spiritWave {
+    0% { box-shadow: 0 0 10px rgba(180, 40, 40, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(180, 40, 40, 0.6), 0 0 80px rgba(180, 40, 40, 0.2); }
+    100% { box-shadow: 0 0 10px rgba(180, 40, 40, 0.3); }
+}
+
+/* 颤抖 */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+/* 发光文字 */
+@keyframes glowText {
+    0%, 100% { text-shadow: 0 0 10px rgba(212, 165, 116, 0.3); }
+    50% { text-shadow: 0 0 30px rgba(212, 165, 116, 0.8), 0 0 60px rgba(212, 165, 116, 0.3); }
+}
+
+/* ============ 动画类 ============ */
+.animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-scaleIn {
+    animation: scaleIn 0.4s ease-out forwards;
+}
+
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+.animate-glow {
+    animation: glowText 2s ease-in-out infinite;
+}
+
+.animate-spiritWave {
+    animation: spiritWave 2s ease-in-out infinite;
+}
+
+.animate-refinementFlash {
+    animation: refinementFlash 0.8s ease-out;
+}
+
+/* 延迟工具类 */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* 初始隐藏（配合动画使用） */
+.anim-hidden {
+    opacity: 0;
+}

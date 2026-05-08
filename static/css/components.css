@@ -1,0 +1,679 @@
+/* ==========================================
+   幻想郷 言霊修行帳 - 组件样式表
+   ========================================== */
+
+/* ============ 板块面板 ============ */
+.panel {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    padding: 0;
+    position: relative;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: var(--shadow-panel), inset 0 0 30px rgba(139, 69, 19, 0.05);
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.panel.visible {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.panel:hover {
+    border-color: var(--color-gold);
+    box-shadow: var(--shadow-red-glow), var(--shadow-glow);
+    transform: translateY(-4px);
+    background: var(--bg-panel-hover);
+}
+
+.panel:active {
+    transform: translateY(-2px) scale(0.99);
+}
+
+/* 面板顶部装饰线 */
+.panel::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.panel:hover::before {
+    opacity: 0.7;
+}
+
+/* 面板角装饰 */
+.panel::after {
+    content: '◆';
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    font-size: 8px;
+    color: var(--color-gold);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    transform: rotate(45deg);
+}
+
+.panel:hover::after {
+    opacity: 0.8;
+}
+
+/* 特色面板 */
+.panel.featured {
+    grid-column: span 2;
+    border-color: var(--border-gold);
+}
+
+.panel.featured::before {
+    background: linear-gradient(90deg, transparent, var(--color-gold), var(--color-primary), var(--color-gold), transparent);
+}
+
+/* 面板头部 */
+.panel-header {
+    background: linear-gradient(180deg, rgba(180, 40, 40, 0.12) 0%, transparent 100%);
+    padding: 18px 20px 12px;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.panel-icon-wrapper {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    background: rgba(180, 40, 40, 0.15);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+    transition: all var(--transition-normal);
+}
+
+.panel:hover .panel-icon-wrapper {
+    background: rgba(180, 40, 40, 0.25);
+    border-color: var(--color-gold);
+    box-shadow: 0 0 15px rgba(212, 165, 116, 0.2);
+}
+
+.panel-number {
+    font-size: 0.75em;
+    color: var(--color-primary);
+    letter-spacing: 0.25em;
+    opacity: 0.8;
+    font-family: var(--font-mono);
+}
+
+.panel-title {
+    font-size: 1.1em;
+    color: var(--color-gold);
+    letter-spacing: 0.08em;
+    font-weight: bold;
+}
+
+/* 面板内容 */
+.panel-body {
+    padding: 16px 20px 20px;
+    font-size: 0.9em;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+.panel-body .preview-jp {
+    color: var(--text-gold);
+    font-size: 1.05em;
+    display: block;
+    margin-top: 8px;
+    font-family: var(--font-jp);
+}
+
+.panel-body .preview-hint {
+    color: var(--text-muted);
+    font-size: 0.85em;
+    display: block;
+    margin-top: 4px;
+}
+
+/* 面板标签 */
+.panel-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.panel-tag {
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    color: var(--text-muted);
+    background: rgba(139, 69, 19, 0.1);
+}
+
+/* ============ 弹窗系统 ============ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-container {
+    background: var(--bg-modal);
+    border: 3px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 700px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 0 60px rgba(180, 40, 40, 0.5), 0 0 120px rgba(100, 50, 120, 0.3);
+    transform: scale(0.9);
+    transition: transform var(--transition-normal);
+}
+
+.modal-overlay.active .modal-container {
+    transform: scale(1);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: 1px solid var(--border-primary);
+    color: var(--color-gold);
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-cn);
+    font-size: 0.9em;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 10;
+}
+
+.modal-close-btn:hover {
+    background: rgba(180, 40, 40, 0.3);
+    border-color: var(--color-gold);
+    box-shadow: 0 0 15px rgba(180, 40, 40, 0.4);
+}
+
+.modal-close-btn .close-icon {
+    font-size: 1.1em;
+}
+
+.modal-close-btn .close-text {
+    font-size: 0.8em;
+    letter-spacing: 0.05em;
+}
+
+.modal-header {
+    padding: 25px 25px 0;
+}
+
+.modal-body {
+    padding: 15px 25px 25px;
+    color: var(--text-secondary);
+    line-height: 1.9;
+}
+
+.modal-footer {
+    padding: 15px 25px 20px;
+    border-top: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.modal-loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+
+/* ============ 符卡样式 ============ */
+.ofuda-card {
+    background: linear-gradient(135deg, #fdf5e6 0%, #f5e6d3 100%);
+    color: var(--ofuda-text, #2c1810);
+    border: 2px solid #8b4513;
+    border-radius: var(--radius-sm);
+    padding: 25px;
+    margin: 15px 0;
+    text-align: center;
+    box-shadow: inset 0 0 30px rgba(139, 69, 19, 0.2), 0 4px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.ofuda-card:hover {
+    box-shadow: inset 0 0 30px rgba(139, 69, 19, 0.3), 0 8px 30px rgba(212, 165, 116, 0.3);
+}
+
+.ofuda-card .rarity-badge {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 0.8em;
+    letter-spacing: 0.3em;
+    color: #c0392b;
+    font-weight: bold;
+}
+
+.ofuda-card .card-word {
+    font-size: 3em;
+    letter-spacing: 0.1em;
+    color: #2c1810;
+    margin: 10px 0;
+    font-family: var(--font-jp);
+}
+
+.ofuda-card .card-reading {
+    font-size: 1.2em;
+    color: #8b4513;
+    margin: 8px 0;
+}
+
+.ofuda-card .card-meaning {
+    font-size: 1em;
+    color: #5c3a20;
+    margin-bottom: 10px;
+}
+
+.ofuda-card .card-example {
+    font-size: 0.9em;
+    color: #6b3a20;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(139, 69, 19, 0.3);
+}
+
+/* SSR 特效 */
+.ofuda-card.ssr {
+    border-color: #c0392b;
+    background: linear-gradient(135deg, #fff8e7 0%, #f5e6d3 100%);
+}
+
+.ofuda-card.ssr .rarity-badge {
+    color: #c0392b;
+    text-shadow: 0 0 10px rgba(192, 57, 43, 0.5);
+}
+
+/* ============ 商店物品 ============ */
+.shop-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 16px;
+    border-bottom: 1px dashed var(--border-light);
+    transition: all var(--transition-fast);
+    border-radius: var(--radius-sm);
+}
+
+.shop-item:hover {
+    background: rgba(180, 140, 100, 0.06);
+}
+
+.shop-item .item-emoji {
+    font-size: 2.2em;
+    width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.shop-item .item-details {
+    flex: 1;
+}
+
+.shop-item .item-name {
+    color: var(--text-gold);
+    font-size: 1.05em;
+    font-family: var(--font-jp);
+}
+
+.shop-item .item-desc {
+    color: var(--text-muted);
+    font-size: 0.85em;
+}
+
+.shop-item .item-price {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 1.1em;
+    min-width: 60px;
+    text-align: right;
+}
+
+/* ============ 弹幕区域 ============ */
+.danmaku-zone {
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px dashed var(--border-gold);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin: 15px 0;
+    min-height: 120px;
+    position: relative;
+    overflow: hidden;
+}
+
+.danmaku-zone::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(212, 165, 116, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(180, 40, 40, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.danmaku-words-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    padding: 15px;
+}
+
+.danmaku-word-chip {
+    background: rgba(180, 40, 40, 0.2);
+    border: 1px solid var(--border-primary);
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border-radius: 20px;
+    user-select: none;
+    color: var(--text-secondary);
+    font-size: 1.1em;
+    font-family: var(--font-jp);
+}
+
+.danmaku-word-chip:hover {
+    background: rgba(180, 40, 40, 0.4);
+    border-color: var(--color-gold);
+    box-shadow: 0 0 15px rgba(212, 165, 116, 0.3);
+    color: var(--text-gold);
+    transform: translateY(-2px);
+}
+
+.danmaku-word-chip.selected {
+    background: rgba(212, 165, 116, 0.25);
+    border-color: var(--color-gold);
+    box-shadow: 0 0 20px rgba(212, 165, 116, 0.5);
+    color: var(--text-gold);
+    animation: spiritWave 2s ease-in-out infinite;
+}
+
+.danmaku-assembled-area {
+    min-height: 55px;
+    border: 1px solid var(--color-gold);
+    margin-top: 15px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    transition: all var(--transition-fast);
+}
+
+.danmaku-assembled-area.correct {
+    border-color: #5a5;
+    box-shadow: 0 0 30px rgba(40, 140, 40, 0.3);
+    animation: refinementFlash 0.8s ease-out;
+}
+
+.danmaku-assembled-area.wrong {
+    border-color: #e74c3c;
+    box-shadow: 0 0 30px rgba(231, 76, 60, 0.3);
+    animation: shake 0.5s ease-in-out;
+}
+
+/* ============ 按钮系统 ============ */
+.btn {
+    display: inline-block;
+    padding: 10px 24px;
+    cursor: pointer;
+    font-family: var(--font-cn);
+    font-size: 0.95em;
+    letter-spacing: 0.1em;
+    transition: all var(--transition-fast);
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border-primary);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background: rgba(180, 40, 40, 0.3);
+    color: var(--text-gold);
+}
+
+.btn-primary:hover {
+    background: rgba(180, 40, 40, 0.5);
+    border-color: var(--color-gold);
+    box-shadow: 0 0 25px rgba(180, 40, 40, 0.5);
+}
+
+.btn-success {
+    background: rgba(40, 140, 40, 0.2);
+    border-color: #5a5;
+    color: #8f8;
+}
+
+.btn-success:hover {
+    background: rgba(40, 140, 40, 0.4);
+    box-shadow: 0 0 25px rgba(40, 140, 40, 0.3);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border-light);
+}
+
+.btn-ghost:hover {
+    background: rgba(180, 40, 40, 0.2);
+    color: var(--text-gold);
+    border-color: var(--color-gold);
+}
+
+.btn-sm {
+    padding: 6px 14px;
+    font-size: 0.8em;
+}
+
+.btn-lg {
+    padding: 14px 32px;
+    font-size: 1.1em;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ============ 神社场景 ============ */
+.shrine-scene {
+    text-align: center;
+    padding: 25px;
+    position: relative;
+}
+
+.shrine-gate {
+    font-size: 6em;
+    display: block;
+    filter: drop-shadow(0 0 20px rgba(212, 165, 116, 0.5));
+    transition: transform var(--transition-normal);
+    cursor: pointer;
+}
+
+.shrine-gate:hover {
+    filter: drop-shadow(0 0 30px rgba(212, 165, 116, 0.7));
+}
+
+.shrine-gate.bow-animation {
+    animation: bow 1.8s ease-in-out;
+}
+
+/* ============ 对决场景 ============ */
+.duel-arena {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+
+.duel-fighter {
+    text-align: center;
+    flex: 1;
+    min-width: 150px;
+}
+
+.duel-fighter .fighter-avatar {
+    font-size: 4em;
+    display: block;
+}
+
+.duel-fighter .fighter-name {
+    color: var(--text-gold);
+    font-size: 1.1em;
+    margin: 8px 0;
+}
+
+.duel-fighter .fighter-spell {
+    color: var(--color-primary);
+    font-size: 0.95em;
+    font-family: var(--font-jp);
+    padding: 8px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    background: rgba(180, 40, 40, 0.1);
+}
+
+.duel-vs {
+    font-size: 2.5em;
+    color: var(--color-gold);
+    text-shadow: 0 0 20px rgba(212, 165, 116, 0.5);
+}
+
+.duel-input-group {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.duel-spell-input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--border-primary);
+    color: var(--text-gold);
+    padding: 12px 20px;
+    font-family: var(--font-jp);
+    font-size: 1em;
+    width: 70%;
+    max-width: 400px;
+    text-align: center;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.duel-spell-input:focus {
+    outline: none;
+    border-color: var(--color-gold);
+    box-shadow: 0 0 25px rgba(212, 165, 116, 0.3);
+}
+
+.duel-spell-input::placeholder {
+    color: var(--text-muted);
+    font-family: var(--font-cn);
+}
+
+/* ============ 文法罗盘 ============ */
+.compass-visual {
+    text-align: center;
+    padding: 20px;
+}
+
+.compass-diagram {
+    display: inline-block;
+    padding: 30px;
+    border: 2px solid var(--border-gold);
+    border-radius: 50%;
+    background: rgba(180, 40, 40, 0.05);
+    position: relative;
+}
+
+.compass-pointer {
+    font-size: 3em;
+    color: var(--color-gold);
+    animation: gentleFloat 4s ease-in-out infinite;
+}
+
+.compass-formula {
+    font-size: 1.1em;
+    color: var(--text-gold);
+    margin-top: 15px;
+    letter-spacing: 0.08em;
+}
+
+/* ============ 加载动画 ============ */
+.loading-spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border-primary);
+    border-top-color: var(--color-gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* ============ 响应式组件调整 ============ */
+@media (max-width: 600px) {
+    .duel-arena {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .ofuda-card .card-word {
+        font-size: 2em;
+    }
+    .danmaku-word-chip {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+    .modal-container {
+        width: 95%;
+        max-height: 90vh;
+    }
+}

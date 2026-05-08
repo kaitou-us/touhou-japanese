@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幻想郷 言霊修行帳 — Touhou Japanese Learning</title>
+    
+    <!-- 样式文件 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    
+    <!-- 预加载字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+    <!-- 全局背景效果层 -->
+    <div class="bg-layer">
+        <div class="bg-stars"></div>
+        <div class="bg-torii"></div>
+        <div class="bg-mist"></div>
+    </div>
+
+    <!-- 粒子系统容器 -->
+    <div id="particles-container"></div>
+
+    <!-- ==================== 顶部导航栏 ==================== -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🏮</span>
+                <span class="brand-text">幻想郷 言霊修行帳</span>
+            </div>
+            <div class="nav-status">
+                <span class="status-indicator" id="apiIndicator"></span>
+                <span class="status-text" id="apiStatusText">连接中...</span>
+            </div>
+            <div class="nav-clock" id="navClock"></div>
+        </div>
+    </nav>
+
+    <!-- ==================== 主容器 ==================== -->
+    <div class="main-container">
+        <!-- 英雄区域 -->
+        <header class="hero-section">
+            <div class="hero-content">
+                <div class="hero-badge">東方Project × 日本語学習</div>
+                <h1 class="hero-title">
+                    <span class="title-jp">幻想郷</span>
+                    <span class="title-divider">—</span>
+                    <span class="title-sub">言霊修行帳</span>
+                </h1>
+                <div class="shimenawa-decoration"></div>
+                <p class="hero-description">
+                    在幻想乡的引导下，掌握日语的言灵之力<br>
+                    六个修行板块，带你走进不一样的学习之旅
+                </p>
+                <div class="hero-scroll-hint">
+                    <span>▼ 开始修行 ▼</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 六大板块网格 -->
+        <section class="panels-section" id="panelsSection">
+            <div class="section-header">
+                <h2 class="section-title">◆ 六大修行板块 ◆</h2>
+                <p class="section-subtitle">选择一个板块，开始你的言灵修行之旅</p>
+            </div>
+            
+            <div class="panels-grid" id="panelsGrid">
+                <!-- 骨架屏加载动画 -->
+                <div class="panel-skeleton" style="--delay: 0s"></div>
+                <div class="panel-skeleton" style="--delay: 0.1s"></div>
+                <div class="panel-skeleton" style="--delay: 0.2s"></div>
+                <div class="panel-skeleton panel-skeleton-featured" style="--delay: 0.3s"></div>
+                <div class="panel-skeleton" style="--delay: 0.4s"></div>
+                <div class="panel-skeleton" style="--delay: 0.5s"></div>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="site-footer">
+            <div class="footer-content">
+                <p>🏮 幻想郷 言霊修行帳 v1.0</p>
+                <p class="footer-quote">「言灵即是力量，大声宣告符卡之名吧！」</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ==================== 全局弹窗系统 ==================== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-container" id="modalContainer">
+            <button class="modal-close-btn" id="modalCloseBtn">
+                <span class="close-icon">✕</span>
+                <span class="close-text">閉じる</span>
+            </button>
+            <div class="modal-header" id="modalHeader"></div>
+            <div class="modal-body" id="modalBody">
+                <div class="modal-loading">
+                    <div class="loading-spinner"></div>
+                    <p>言灵之力加载中...</p>
+                </div>
+            </div>
+            <div class="modal-footer" id="modalFooter"></div>
+        </div>
+    </div>
+
+    <!-- ==================== 通知提示系统 ==================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ==================== 底部快捷栏 ==================== -->
+    <div class="quick-bar" id="quickBar">
+        <div class="quick-bar-inner">
+            <button class="quick-btn" onclick="quickAction('card')" title="快速抽卡">
+                <span>🎴</span> 抽卡
+            </button>
+            <button class="quick-btn" onclick="quickAction('duel')" title="符卡对决">
+                <span>⚔️</span> 对决
+            </button>
+            <button class="quick-btn" onclick="quickAction('shop')" title="杂货铺">
+                <span>🏮</span> 商店
+            </button>
+            <button class="quick-btn" onclick="quickAction('grammar')" title="文法罗盘">
+                <span>🧭</span> 文法
+            </button>
+            <button class="quick-btn" onclick="quickAction('danmaku')" title="弹幕洗练">
+                <span>💥</span> 弹幕
+            </button>
+            <button class="quick-btn" onclick="quickAction('culture')" title="神社">
+                <span>⛩️</span> 神社
+            </button>
+        </div>
+    </div>
+
+    <!-- 回到顶部按钮 -->
+    <button class="back-to-top" id="backToTop" title="回到顶部">▲</button>
+
+    <!-- JavaScript 文件 -->
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/panels.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

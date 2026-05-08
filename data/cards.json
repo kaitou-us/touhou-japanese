@@ -1,0 +1,209 @@
+{
+  "vocabulary_cards": [
+    {
+      "id": 1,
+      "word": "夢",
+      "reading": "ゆめ",
+      "meaning": "梦想",
+      "rarity": "SSR",
+      "example": "大きな夢を持っています。",
+      "example_reading": "拥有远大的梦想。",
+      "category": "抽象概念"
+    },
+    {
+      "id": 2,
+      "word": "絆",
+      "reading": "きずな",
+      "meaning": "羁绊",
+      "rarity": "SSR",
+      "example": "友達との絆を大切に。",
+      "example_reading": "珍惜与朋友的羁绊。",
+      "category": "人际关系"
+    },
+    {
+      "id": 3,
+      "word": "桜",
+      "reading": "さくら",
+      "meaning": "樱花",
+      "rarity": "SR",
+      "example": "桜が満開です。",
+      "example_reading": "樱花盛开了。",
+      "category": "自然"
+    },
+    {
+      "id": 4,
+      "word": "妖",
+      "reading": "あやかし",
+      "meaning": "妖怪",
+      "rarity": "SR",
+      "example": "妖の仕業かもしれない。",
+      "example_reading": "可能是妖怪干的。",
+      "category": "幻想"
+    },
+    {
+      "id": 5,
+      "word": "霊",
+      "reading": "れい",
+      "meaning": "灵魂",
+      "rarity": "R",
+      "example": "霊の存在を感じる。",
+      "example_reading": "感受到灵魂的存在。",
+      "category": "幻想"
+    },
+    {
+      "id": 6,
+      "word": "幻想",
+      "reading": "げんそう",
+      "meaning": "幻想",
+      "rarity": "SSR",
+      "example": "幻想郷へようこそ。",
+      "example_reading": "欢迎来到幻想乡。",
+      "category": "世界观"
+    },
+    {
+      "id": 7,
+      "word": "博麗",
+      "reading": "はくれい",
+      "meaning": "博丽",
+      "rarity": "SR",
+      "example": "博麗神社の巫女。",
+      "example_reading": "博丽神社的巫女。",
+      "category": "地名"
+    },
+    {
+      "id": 8,
+      "word": "結界",
+      "reading": "けっかい",
+      "meaning": "结界",
+      "rarity": "R",
+      "example": "結界を張る。",
+      "example_reading": "张开结界。",
+      "category": "能力"
+    },
+    {
+      "id": 9,
+      "word": "永遠",
+      "reading": "えいえん",
+      "meaning": "永远",
+      "rarity": "SR",
+      "example": "永遠に続く夜。",
+      "example_reading": "永远持续的黑夜。",
+      "category": "时间"
+    },
+    {
+      "id": 10,
+      "word": "紅魔",
+      "reading": "こうま",
+      "meaning": "红魔",
+      "rarity": "R",
+      "example": "紅魔館の主。",
+      "example_reading": "红魔馆的主人。",
+      "category": "地名"
+    }
+  ],
+  "shop_items": [
+    {
+      "id": 1,
+      "name_jp": "きゅうり",
+      "name_cn": "黄瓜",
+      "description": "新鲜采摘的幻想乡黄瓜，河童特选",
+      "price": 120,
+      "icon": "🥒"
+    },
+    {
+      "id": 2,
+      "name_jp": "だんご",
+      "name_cn": "团子",
+      "description": "三色花见团子·白玉楼特供",
+      "price": 350,
+      "icon": "🍡"
+    },
+    {
+      "id": 3,
+      "name_jp": "ガジェット",
+      "name_cn": "机械小工具",
+      "description": "河童特制·光学迷彩螺丝刀",
+      "price": 980,
+      "icon": "🔧"
+    },
+    {
+      "id": 4,
+      "name_jp": "お守り",
+      "name_cn": "护身符",
+      "description": "博丽神社开光护身符",
+      "price": 500,
+      "icon": "🎐"
+    },
+    {
+      "id": 5,
+      "name_jp": "霊符",
+      "name_cn": "灵符",
+      "description": "退治妖怪用的灵符一套",
+      "price": 800,
+      "icon": "📜"
+    }
+  ],
+  "danmaku_exercises": [
+    {
+      "id": 1,
+      "words": ["私", "は", "ケーキ", "を", "食べます"],
+      "correct_order": ["私", "は", "ケーキ", "を", "食べます"],
+      "meaning": "我吃蛋糕"
+    },
+    {
+      "id": 2,
+      "words": ["彼女", "は", "猫", "が", "好きです"],
+      "correct_order": ["彼女", "は", "猫", "が", "好きです"],
+      "meaning": "她喜欢猫"
+    },
+    {
+      "id": 3,
+      "words": ["明日", "雨", "が", "降ります"],
+      "correct_order": ["明日", "雨", "が", "降ります"],
+      "meaning": "明天会下雨"
+    },
+    {
+      "id": 4,
+      "words": ["私", "は", "日本語", "を", "勉強します"],
+      "correct_order": ["私", "は", "日本語", "を", "勉強します"],
+      "meaning": "我学习日语"
+    }
+  ],
+  "grammar_points": [
+    {
+      "id": 1,
+      "title": "SOV语序结构",
+      "description": "日语的基本语序是主语(S)+宾语(O)+谓语(V)，与中文的SVO不同",
+      "example_wrong": "我 吃 苹果",
+      "example_correct": "私は リンゴを 食べます",
+      "formula": "主语 + は/が + 宾语 + を + 谓语(动词在最后)",
+      "tip": "谓语永远在句末，助词是指针，指引每个词的角色"
+    }
+  ],
+  "culture_points": [
+    {
+      "id": 1,
+      "title": "参拜礼仪",
+      "content": "二礼二拍手一礼（にれい にはくしゅ いちれい）",
+      "steps": [
+        "鞠躬两次（二礼）",
+        "拍手两次（二拍手）",
+        "最后鞠躬一次（一礼）"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "三神器（三種の神器）",
+      "items": [
+        {"name": "草薙剣", "reading": "くさなぎのつるぎ", "meaning": "天丛云剑"},
+        {"name": "八咫鏡", "reading": "やたのかがみ", "meaning": "八咫镜"},
+        {"name": "八尺瓊勾玉", "reading": "やさかにのまがたま", "meaning": "八尺琼勾玉"}
+      ]
+    },
+    {
+      "id": 3,
+      "title": "いただきます的深意",
+      "content": "不仅仅是“我开动了”，“而是对神赐生命的一种感恩，体现日本文化中的「もったいない」精神”"
+    }
+  ]
+}
