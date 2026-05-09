@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupModalClose();
     setupClock();
     setupKeyboardShortcuts();
+    setupJLPTToggle();
     
     // ========== 第六步：加载用户头部信息 ==========
     if (existingToken) {
@@ -77,6 +78,7 @@ async function checkAPIStatus() {
 // ==================== 导航栏 ====================
 
 function setupNavScroll() {
+    initJLPTToggle();
     const nav = document.querySelector('.top-nav');
     if (!nav) return;
     
@@ -441,3 +443,211 @@ window.goBackToDraw = goBackToDraw;
 window.confirmRegistration = confirmRegistration;
 window.openInventory = openInventory;
 window.loadUserHeader = loadUserHeader;
+
+
+
+// ==================== 搜索系统 ====================
+
+let searchTimeout = null;
+
+function openSearchUI() {
+    let searchOverlay = document.getElementById('searchOverlay');
+    if (searchOverlay) {
+        searchOverlay.classList.add('active');
+        const input = document.getElementById('searchInput');
+        if (input) input.focus();
+        return;
+    }
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'searchOverlay';
+    overlay.className = 'search-overlay active';
+    overlay.innerHTML = `
+        <div class="search-backdrop" onclick="closeSearchUI()"></div>
+        <div class="search-panel">
+            <div class="search-header">
+                <div class="search-input-wrapper">
+                    <input type="text" class="search-input" id="searchInput" 
+                           placeholder="搜索词汇、读音、含义、等级..." 
+                           oninput="handleSearchInput(this.value)">
+                    <button class="search-input-clear" id="searchClearBtn" onclick="clearSearch()">✕</button>
+                </div>
+                <button class="search-close-btn" onclick="closeSearchUI()">✕</button>
+            </div>
+            <div class="search-hints">
+                <span class="search-hint-tag" onclick="quickSearch('N1')">N1</span>
+                <span class="search-hint-tag" onclick="quickSearch('N2')">N2</span>
+                <span class="search-hint-tag" onclick="quickSearch('N3')">N3</span>
+                <span class="search-hint-tag" onclick="quickSearch('N4')">N4</span>
+                <span class="search-hint-tag" onclick="quickSearch('N5')">N5</span>
+                <span class="search-hint-tag" onclick="quickSearch('SSR')">⭐ SSR</span>
+                <span class="search-hint-tag" onclick="quickSearch('自然')">自然</span>
+                <span class="search-hint-tag" onclick="quickSearch('幻想')">幻想</span>
+            </div>
+            <div class="search-results" id="searchResults">
+                <div style="text-align:center;padding:40px;color:var(--text-muted);">
+                    <span style="font-size:2.5em;display:block;margin-bottom:10px;">🔍</span>
+                    输入关键词开始搜索符卡词汇
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    setTimeout(() => {
+        const input = document.getElementById('searchInput');
+        if (input) input.focus();
+    }, 300);
+}
+
+function closeSearchUI() {
+    const overlay = document.getElementById('searchOverlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => overlay.remove(), 300);
+    }
+}
+
+function handleSearchInput(query) {
+    const clearBtn = document.getElementById('searchClearBtn');
+    if (clearBtn) clearBtn.classList.toggle('visible', query.length > 0);
+    
+    if (searchTimeout) clearTimeout(searchTimeout);
+    
+    if (!query.trim()) {
+        document.getElementById('searchResults').innerHTML = `
+            <div style="text-align:center;padding:40px;color:var(--text-muted);">
+                <span style="font-size:2.5em;display:block;margin-bottom:10px;">🔍</span>
+                输入关键词开始搜索符卡词汇
+            </div>
+        `;
+        return;
+    }
+    
+    searchTimeout = setTimeout(() => performSearch(query.trim()), 300);
+}
+
+async function performSearch(query) {
+    const resultsDiv = document.getElementById('searchResults');
+    resultsDiv.innerHTML = '<div class="search-loading"><div class="loading-spinner"></div></div>';
+    
+    try {
+        // 获取 JLPT 设置
+        const jlpt = localStorage.getItem('jlpt_enabled') || 'true';
+        const res = await fetch(`${window.location.origin}/api/cards/search?q=${encodeURIComponent(query)}&jlpt=${jlpt}`);
+        const data = await res.json();
+        
+        if (!data.success || data.total === 0) {
+            resultsDiv.innerHTML = `
+                <div class="search-no-results">
+                    <span class="no-results-icon">🔍</span>
+                    <p>未找到与 "<strong>${escapeHTML(query)}</strong>" 相关的词汇</p>
+                    <p style="font-size:0.85em;margin-top:5px;">试试搜索：N1、SSR、自然、幻想...</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const infoHTML = `<div class="search-result-info">找到 <strong>${data.total}</strong> 个词汇${jlpt === 'false' ? '（JLPT已隐藏）' : ''}</div>`;
+        
+        const itemsHTML = data.results.map(item => {
+            const c = item;
+            return `
+                <div class="search-result-item" onclick="viewCardDetail(${c.id})">
+                    <span class="search-result-rarity ${c.rarity}">${c.rarity}</span>
+                    <span class="search-result-word">${c.word}</span>
+                    <span class="search-result-reading">${c.reading || ''}</span>
+                    <span class="search-result-meaning">${c.meaning}</span>
+                    <span class="search-result-level">${c.level || ''}</span>
+                </div>
+            `;
+        }).join('');
+        
+        resultsDiv.innerHTML = infoHTML + itemsHTML;
+    } catch (e) {
+        resultsDiv.innerHTML = '<div class="search-no-results"><p>查询失败，请检查网络</p></div>';
+    }
+}
+
+function quickSearch(query) {
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.value = query;
+        handleSearchInput(query);
+        input.focus();
+    }
+}
+
+function clearSearch() {
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.value = '';
+        handleSearchInput('');
+        input.focus();
+    }
+}
+
+function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function viewCardDetail(cardId) {
+    closeSearchUI();
+    setTimeout(() => Panels.openModal(1), 200);
+}
+
+// 导出搜索函数
+window.openSearchUI = openSearchUI;
+window.closeSearchUI = closeSearchUI;
+window.handleSearchInput = handleSearchInput;
+window.quickSearch = quickSearch;
+window.clearSearch = clearSearch;
+window.viewCardDetail = viewCardDetail;
+
+
+// ==================== JLPT 单词切换 ====================
+
+let jlptEnabled = true;  // 默认开启
+
+function toggleJLPT() {
+    jlptEnabled = !jlptEnabled;
+    const btn = document.getElementById('jlptToggleBtn');
+    
+    if (btn) {
+        if (jlptEnabled) {
+            btn.classList.add('active');
+            btn.classList.remove('disabled');
+            btn.title = 'JLPT单词已开启';
+            Panels.showToast('📚', 'JLPT单词已开启，可以抽取所有词汇', 'success');
+        } else {
+            btn.classList.remove('active');
+            btn.classList.add('disabled');
+            btn.title = 'JLPT单词已关闭';
+            Panels.showToast('🔒', 'JLPT单词已隐藏，只抽取幻想乡原词', 'info');
+        }
+    }
+    
+    // 保存设置
+    localStorage.setItem('jlpt_enabled', jlptEnabled.toString());
+}
+
+function initJLPTToggle() {
+    // 从 localStorage 加载设置
+    const saved = localStorage.getItem('jlpt_enabled');
+    if (saved !== null) {
+        jlptEnabled = saved === 'true';
+    }
+    
+    const btn = document.getElementById('jlptToggleBtn');
+    if (btn) {
+        if (jlptEnabled) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.add('disabled');
+        }
+    }
+}
+
+window.toggleJLPT = toggleJLPT;

@@ -371,6 +371,149 @@ def get_equipment():
         return jsonify({"success": False, "message": "请先登录"}), 401
     return jsonify({"success": True, "data": user['inventory']['equipment']})
 
+
+
+# ==================== 搜索系统 ====================
+
+@app.route('/api/search')
+def search():
+    """搜索词汇"""
+    query = request.args.get('q', '').strip()
+    if not query:
+        return jsonify({"success": False, "message": "请输入搜索关键词"}), 400
+
+    data = load_data()
+    results = []
+    query_lower = query.lower()
+
+    for card in data.get('vocabulary_cards', []):
+        # 在单词、读音、含义、分类、等级中搜索
+        word = card.get('word', '')
+        reading = card.get('reading', '')
+        meaning = card.get('meaning', '')
+        category = card.get('category', '')
+        level = card.get('level', '')
+        
+        if (query_lower in word.lower() or
+            query_lower in reading.lower() or
+            query_lower in meaning.lower() or
+            query_lower in category.lower() or
+            query_lower in level.lower()):
+            results.append({"type": "词汇符卡", "data": card})
+
+    return jsonify({
+        "success": True,
+        "query": query,
+        "results": results,
+        "total": len(results)
+    })
+
+
+# ---------- 符卡查询 ----------
+
+@app.route('/api/cards/search')
+def search_cards():
+    """查询符卡词汇（支持关键词和类型筛选）"""
+    query = request.args.get('q', '').strip()
+    include_jlpt = request.args.get('jlpt', 'true').lower() == 'true'
+    
+    data = load_data()
+    cards = data.get('vocabulary_cards', [])
+    
+    results = []
+    for card in cards:
+        # 如果不包含JLPT，跳过JLPT词汇
+        if not include_jlpt and card.get('category') == 'JLPT':
+            continue
+        
+        # 关键词匹配
+        if query:
+            if (query.lower() in card.get('word', '').lower() or
+                query.lower() in card.get('reading', '').lower() or
+                query.lower() in card.get('meaning', '').lower() or
+                query.lower() in card.get('level', '').lower() or
+                query.lower() in card.get('category', '').lower()):
+                results.append(card)
+        else:
+            results.append(card)
+    
+    return jsonify({
+        "success": True,
+        "query": query,
+        "include_jlpt": include_jlpt,
+        "results": results,
+        "total": len(results)
+    })
+
+
+@app.route('/api/cards/filtered')
+def filtered_cards():
+    """根据设置返回过滤后的卡池"""
+    include_jlpt = request.args.get('jlpt', 'true').lower() == 'true'
+    
+    data = load_data()
+    cards = data.get('vocabulary_cards', [])
+    
+    if include_jlpt:
+        filtered = cards
+    else:
+        filtered = [c for c in cards if c.get('category') != 'JLPT']
+    
+    return jsonify({
+        "success": True,
+        "total": len(filtered),
+        "include_jlpt": include_jlpt
+    })
+
+
+@app.route('/api/card/random/filtered')
+def random_filtered_card():
+    """根据设置随机抽取符卡"""
+    include_jlpt = request.args.get('jlpt', 'true').lower() == 'true'
+    
+    data = load_data()
+    cards = data.get('vocabulary_cards', [])
+    
+    if not include_jlpt:
+        cards = [c for c in cards if c.get('category') != 'JLPT']
+    
+    if not cards:
+        return jsonify({"success": False, "message": "符卡池为空，请开启JLPT词汇"}), 500
+    
+    card = random.choice(cards)
+    return jsonify({
+        "success": True,
+        "data": card,
+        "message": f"🎴 抽到了 <{card['rarity']}> 级别的言灵！"
+    })
+
+
+@app.route('/api/search/stats')
+def search_stats():
+    """获取搜索统计信息"""
+    data = load_data()
+    cards = data.get('vocabulary_cards', [])
+    
+    stats = {
+        "total": len(cards),
+        "by_level": {},
+        "by_rarity": {},
+        "by_category": {}
+    }
+    
+    for card in cards:
+        level = card.get('level', '未知')
+        rarity = card.get('rarity', '未知')
+        category = card.get('category', '其他')
+        
+        stats["by_level"][level] = stats["by_level"].get(level, 0) + 1
+        stats["by_rarity"][rarity] = stats["by_rarity"].get(rarity, 0) + 1
+        stats["by_category"][category] = stats["by_category"].get(category, 0) + 1
+    
+    return jsonify({"success": True, "data": stats})
+
+
+
 # ==================== 错误处理 ====================
 
 @app.errorhandler(404)

@@ -328,6 +328,30 @@
     border-top: 1px dashed rgba(139, 69, 19, 0.3);
 }
 
+/* 等级标签 */
+.ofuda-card .card-level {
+    position: absolute;
+    top: 10px;
+    left: 14px;
+    font-size: 0.75em;
+    padding: 2px 8px;
+    border-radius: 8px;
+    background: rgba(100, 50, 120, 0.2);
+    color: #b8a0c8;
+    letter-spacing: 0.1em;
+}
+
+/* 读音 */
+.ofuda-card .card-reading {
+    font-size: 1.3em;
+    color: #c0392b;
+    margin: 5px 0;
+    font-family: var(--font-jp);
+    letter-spacing: 0.05em;
+}
+
+
+
 /* SSR 特效 */
 .ofuda-card.ssr {
     border-color: #c0392b;
@@ -674,22 +698,81 @@
     animation: spin 0.8s linear infinite;
 }
 
-/* ============ 响应式组件调整 ============ */
-@media (max-width: 600px) {
-    .duel-arena {
-        flex-direction: column;
-        gap: 15px;
+/* ==========================================
+   符卡展示 - 移动端优化
+   ========================================== */
+
+@media (max-width: 768px) {
+    /* 符卡整体 */
+    .ofuda-card {
+        padding: 16px 14px;
+        margin: 8px 0;
     }
+    
+    /* 单词 */
     .ofuda-card .card-word {
         font-size: 2em;
+        margin: 8px 0 4px;
     }
-    .danmaku-word-chip {
-        padding: 8px 12px;
-        font-size: 0.9em;
+    
+    /* 读音 */
+    .ofuda-card .card-reading {
+        font-size: 1.1em;
+        margin: 2px 0 8px;
+        color: #c0392b;
     }
-    .modal-container {
-        width: 95%;
-        max-height: 90vh;
+    
+    /* 含义 */
+    .ofuda-card .card-meaning {
+        font-size: 0.95em;
+    }
+    
+    /* 等级标签 */
+    .ofuda-card .card-level {
+        font-size: 0.7em;
+        padding: 2px 6px;
+        top: 8px;
+        left: 10px;
+    }
+    
+    /* 稀有度标签 */
+    .ofuda-card .rarity-badge {
+        font-size: 0.7em;
+        top: 8px;
+        right: 10px;
+    }
+    
+    /* 例句 */
+    .ofuda-card .card-example {
+        font-size: 0.8em;
+        padding-top: 8px;
+        margin-top: 8px;
+    }
+    
+    /* 分类 */
+    .ofuda-card .card-category {
+        font-size: 0.7em;
+    }
+    
+    /* 按钮 */
+    .btn-lg {
+        padding: 12px 24px;
+        font-size: 0.95em;
+    }
+}
+
+/* 小屏手机 */
+@media (max-width: 380px) {
+    .ofuda-card .card-word {
+        font-size: 1.6em;
+    }
+    
+    .ofuda-card .card-reading {
+        font-size: 1em;
+    }
+    
+    .ofuda-card .card-meaning {
+        font-size: 0.85em;
     }
 }
 /* ==========================================

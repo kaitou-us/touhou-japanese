@@ -153,27 +153,39 @@ const Panels = (() => {
         currentExerciseId = 1;
     }
     
-    // ==================== 1. 词汇符卡 ====================
-    async function renderCardPanel() {
-        try {
-            const result = await API.getRandomCard();
-            const card = result.data;
-            
-            return `
-                <div class="modal-header">
-                    <div class="modal-title" style="font-size:1.6em;color:var(--color-gold);text-align:center;">
-                        📜 词汇符卡 — 言灵収集
-                    </div>
-                    <div class="modal-subtitle" style="text-align:center;color:#887060;font-size:0.9em;">
-                        Spell Card Collection · 理解关键名词
-                    </div>
+// ==================== 1. 词汇符卡 ====================
+
+async function getFilteredRandomCard() {
+    const jlpt = localStorage.getItem('jlpt_enabled') || 'true';
+    const res = await fetch(`${window.location.origin}/api/card/random/filtered?jlpt=${jlpt}`);
+    return res.json();
+}
+
+async function renderCardPanel() {
+    try {
+        const result = await getFilteredRandomCard();
+        const card = result.data;
+        
+        var readingText = card.reading || '';
+        var readingDisplay = readingText;
+        
+        return `
+            <div class="modal-header">
+                <div class="modal-title" style="font-size:1.6em;color:var(--color-gold);text-align:center;">
+                    📜 词汇符卡 — 言灵収集
                 </div>
-                <div class="ofuda-card ${card.rarity === 'SSR' ? 'ssr' : ''}" id="ofudaDisplay">
+                <div class="modal-subtitle" style="text-align:center;color:#887060;font-size:0.9em;">
+                    Spell Card Collection · 理解关键名词
+                </div>
+            </div>
+            <div class="modal-content">
+                <div class="ofuda-card ${card.rarity === 'SSR' ? 'ssr' : ''}" id="ofudaCard">
                     <div class="rarity-badge">
                         ${'★'.repeat(card.rarity === 'SSR' ? 5 : card.rarity === 'SR' ? 4 : 3)} ${card.rarity}
                     </div>
+                    <div class="card-level">${card.level || ''}</div>
                     <div class="card-word">${card.word}</div>
-                    <div class="card-reading">${card.reading}</div>
+                    <div class="card-reading">${readingDisplay}</div>
                     <div class="card-meaning">${card.meaning}</div>
                     <div class="card-example">
                         <strong>例句：</strong>${card.example}<br>
@@ -183,48 +195,56 @@ const Panels = (() => {
                         分类：${card.category}
                     </div>
                 </div>
-                <div class="modal-footer">
+                <p style="text-align:center; color:#b8956a; margin-top:15px;">
+                    ✦ 点击下方按钮重新抽取符卡 ✦
+                </p>
+                <div style="text-align:center;">
                     <button class="btn btn-primary btn-lg" onclick="Panels.refreshCard()">
                         🎴 抽取新的符卡
                     </button>
                 </div>
-            `;
-        } catch (error) {
-            throw error;
-        }
+            </div>
+        `;
+    } catch (error) {
+        throw error;
     }
-    
-    async function refreshCard() {
-        try {
-            const result = await API.getRandomCard();
-            const card = result.data;
-            const display = document.getElementById('ofudaDisplay');
+}
+
+async function refreshCard() {
+    try {
+        var result = await getFilteredRandomCard();
+        var card = result.data;
+        var display = document.getElementById('ofudaCard');
+        
+        if (display) {
+            var readingText = card.reading || '';
+            var readingDisplay = readingText;
             
-            if (display) {
-                display.className = `ofuda-card ${card.rarity === 'SSR' ? 'ssr' : ''}`;
-                display.innerHTML = `
-                    <div class="rarity-badge">
-                        ${'★'.repeat(card.rarity === 'SSR' ? 5 : card.rarity === 'SR' ? 4 : 3)} ${card.rarity}
-                    </div>
-                    <div class="card-word">${card.word}</div>
-                    <div class="card-reading">${card.reading}</div>
-                    <div class="card-meaning">${card.meaning}</div>
-                    <div class="card-example">
-                        <strong>例句：</strong>${card.example}<br>
-                        <span style="color:#8b4513;">${card.example_reading}</span>
-                    </div>
-                    <div style="margin-top:8px;font-size:0.8em;color:#a08060;">
-                        分类：${card.category}
-                    </div>
-                `;
-                
-                Effects.cardFlipEffect(display);
-                showToast('🎴', `抽到了 ${card.rarity} 级言灵：${card.word}`);
-            }
-        } catch (error) {
-            showToast('💢', '抽卡失败，请重试', 'error');
+            display.className = 'ofuda-card ' + (card.rarity === 'SSR' ? 'ssr' : '');
+            display.innerHTML = `
+                <div class="rarity-badge">
+                    ${'★'.repeat(card.rarity === 'SSR' ? 5 : card.rarity === 'SR' ? 4 : 3)} ${card.rarity}
+                </div>
+                <div class="card-level">${card.level || ''}</div>
+                <div class="card-word">${card.word}</div>
+                <div class="card-reading">${readingDisplay}</div>
+                <div class="card-meaning">${card.meaning}</div>
+                <div class="card-example">
+                    <strong>例句：</strong>${card.example}<br>
+                    <span style="color:#8b4513;">${card.example_reading}</span>
+                </div>
+                <div style="margin-top:8px;font-size:0.8em;color:#a08060;">
+                    分类：${card.category}
+                </div>
+            `;
+            
+            Effects.cardFlipEffect(display);
+            Panels.showToast('🎴', '抽到了 ' + card.rarity + ' 级言灵：' + card.word);
         }
+    } catch (error) {
+        Panels.showToast('💢', '抽卡失败，请重试', 'error');
     }
+}
     
     // ==================== 2. 符卡对决 ====================
     async function renderDuelPanel() {
