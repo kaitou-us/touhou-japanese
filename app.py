@@ -76,7 +76,7 @@ def get_panels():
         {"id": 1, "icon": "🈶", "number": "其の壹", "title": "词汇符卡 — 言灵収集", "description": "收集散落的言灵，构建你的专属词汇库", "featured": False},
         {"id": 2, "icon": "⚔️", "number": "其の弐", "title": "符卡对决 — 宣告之战", "description": "言灵即是力量。抽出符卡，大声读出单词", "featured": False},
         {"id": 3, "icon": "🏮", "number": "其の参", "title": "河童杂货铺 — 买卖修行", "description": "在河童的机械杂货铺里，用日语购物", "featured": False},
-        {"id": 4, "icon": "🧭", "number": "其の四", "title": "迷路竹林文法罗盘", "description": "谓语在最后，助词是指针。走出语序竹林", "featured": True},
+        {"id": 4, "icon": "🧭", "number": "其の四", "title": "迷路竹林文法罗盘", "description": "谓语在最后，助词是指针。走出语序竹林", "featured": False},  # ← 改为 False
         {"id": 5, "icon": "💥", "number": "其の五", "title": "弹幕洗练 — 句子重组", "description": "在弹幕地狱中冷静重组语法", "featured": False},
         {"id": 6, "icon": "⛩️", "number": "其の陸", "title": "神社点 — 神话与文化", "description": "每一座神社都是一部活着的古事记", "featured": False}
     ]
