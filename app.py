@@ -371,6 +371,79 @@ def get_equipment():
         return jsonify({"success": False, "message": "请先登录"}), 401
     return jsonify({"success": True, "data": user['inventory']['equipment']})
 
+# ---------- 收藏系统 ----------
+
+@app.route('/api/favorites')
+def get_favorites():
+    """获取收藏列表"""
+    user_token = request.args.get('token', '')
+    data, user = get_or_create_user(user_token)
+    if not user:
+        return jsonify({"success": False, "message": "请先登录"}), 401
+    return jsonify({"success": True, "data": user.get('favorites', [])})
+
+
+@app.route('/api/favorites/add', methods=['POST'])
+def add_favorite():
+    user_token = request.json.get('token', '')
+    data, user = get_or_create_user(user_token)
+    if not user:
+        return jsonify({"success": False, "message": "请先登录"}), 401
+    
+    card_id = request.json.get('card_id')
+    word = request.json.get('word', '')
+    reading = request.json.get('reading', '')
+    meaning = request.json.get('meaning', '')
+    rarity = request.json.get('rarity', 'R')
+    level = request.json.get('level', '')
+    
+    if 'favorites' not in user:
+        user['favorites'] = []
+    
+    # 检查是否已收藏
+    if any(str(f.get('card_id')) == str(card_id) for f in user['favorites']):
+        return jsonify({"success": False, "message": "已收藏过此符卡"})
+    
+    user['favorites'].append({
+        "card_id": card_id,
+        "word": word,
+        "reading": reading,
+        "meaning": meaning,
+        "rarity": rarity,
+        "level": level,
+        "favorited_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    })
+    
+    save_users_data(data)
+    return jsonify({"success": True, "message": f"已收藏「{word}」！"})
+
+    
+@app.route('/api/favorites/remove', methods=['POST'])
+def remove_favorite():
+    """取消收藏"""
+    user_token = request.json.get('token', '')
+    card_id = request.json.get('card_id')
+    
+    data, user = get_or_create_user(user_token)
+    if not user:
+        return jsonify({"success": False, "message": "请先登录"}), 401
+    
+    if 'favorites' not in user:
+        return jsonify({"success": False, "message": "收藏列表为空"})
+    
+    # 修复：统一转为字符串比较，确保匹配
+    before_count = len(user['favorites'])
+    user['favorites'] = [
+        f for f in user['favorites'] 
+        if str(f.get('card_id')) != str(card_id)
+    ]
+    after_count = len(user['favorites'])
+    
+    if after_count < before_count:
+        save_users_data(data)
+        return jsonify({"success": True, "message": "已取消收藏"})
+    else:
+        return jsonify({"success": False, "message": "未找到该收藏"})
 
 
 # ==================== 搜索系统 ====================
