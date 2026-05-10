@@ -132,11 +132,75 @@ def shop():
 
 @app.route('/api/shop/buy', methods=['POST'])
 def buy_item():
+    """购买商品，消耗賽錢"""
     item_name = request.json.get('item_name', '')
+    user_token = request.json.get('token', '')
+    
     if not item_name:
         return jsonify({"success": False, "message": "请指定要购买的商品"}), 400
-    return jsonify({"success": True, "message": f"「{item_name}」をください！— 好的，这是您的{item_name}！", "item": item_name})
-
+    
+    # 商品价格表
+    shop_prices = {
+        "きゅうり": {"price": 120, "item": "博丽茶", "effect": "恢复50点灵力", "icon": "🍵"},
+        "だんご": {"price": 350, "item": "欢迎团子", "effect": "恢复30点灵力", "icon": "🍡"},
+        "ガジェット": {"price": 980, "item": "河童机械零件", "effect": "可用于合成或强化", "icon": "⚙️"},
+        "お守り": {"price": 500, "item": "博丽护身符", "effect": "提升一次抽卡好运", "icon": "🎐"},
+        "霊符": {"price": 800, "item": "灵击札", "effect": "下一场对决攻击力翻倍", "icon": "📜"},
+    }
+    
+    if item_name not in shop_prices:
+        return jsonify({"success": False, "message": "未知商品"}), 400
+    
+    item_info = shop_prices[item_name]
+    price = item_info["price"]
+    
+    # 如果有用户token，扣除货币并添加到背包
+    if user_token:
+        data, user = get_or_create_user(user_token)
+        if user:
+            if 'currencies' not in user:
+                user['currencies'] = {'靈珠': 0, '賽錢': 0, '信仰ポイント': 0}
+            
+            if user['currencies'].get('賽錢', 0) < price:
+                return jsonify({"success": False, "message": f"賽錢不足！需要 {price} 賽錢，当前只有 {user['currencies'].get('賽錢', 0)} 賽錢"}), 400
+            
+            # 扣除賽錢
+            user['currencies']['賽錢'] -= price
+            
+            # 添加到背包
+            if 'inventory' not in user:
+                user['inventory'] = {"spell_cards": [], "items": [], "equipment": []}
+            
+            # 检查是否已有该道具
+            existing = next((i for i in user['inventory']['items'] if i['name'] == item_info['item']), None)
+            if existing:
+                existing['quantity'] += 1
+            else:
+                user['inventory']['items'].append({
+                    "id": f"item_{len(user['inventory']['items']) + 1}_{int(datetime.datetime.now().timestamp())}",
+                    "name": item_info['item'],
+                    "type": "consumable",
+                    "rarity": "R",
+                    "quantity": 1,
+                    "effect": item_info['effect'],
+                    "description": f"从河童杂货铺购买的{item_info['item']}",
+                    "icon": item_info['icon']
+                })
+            
+            save_users_data(data)
+            
+            return jsonify({
+                "success": True,
+                "message": f"购买成功！花费 {price} 賽錢，获得 {item_info['item']}",
+                "balance": user['currencies']['賽錢'],
+                "item": item_info['item']
+            })
+    
+    return jsonify({
+        "success": True,
+        "message": f"「{item_name}」をください！— 好的，这是您的{item_name}！",
+        "item": item_name
+    })
 # ---------- 4. 文法罗盘 ----------
 
 @app.route('/api/grammar')

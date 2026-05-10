@@ -392,19 +392,38 @@ async function refreshCard() {
         }
     }
     
-    async function buyItem(itemName) {
+        async function buyItem(itemName) {
+        const token = localStorage.getItem('touhou_user_token') || '';
+        
         try {
-            const res = await API.buyItem(itemName);
+            const res = await fetch(`${window.location.origin}/api/shop/buy`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item_name: itemName, token: token })
+            });
+            
+            const data = await res.json();
             const resultDiv = document.getElementById('buyResult');
+            
             if (resultDiv) {
-                resultDiv.innerHTML = `🛒 ${res.message}`;
-                showToast('🛒', res.message, 'success');
+                if (data.success) {
+                    resultDiv.innerHTML = `🛒 ${data.message}${data.balance !== undefined ? ' (剩余賽錢: ' + data.balance + ')' : ''}`;
+                    showToast('🛒', data.message, 'success');
+                    
+                    // 刷新用户头部货币
+                    if (window.loadUserHeader) {
+                        setTimeout(window.loadUserHeader, 500);
+                    }
+                } else {
+                    resultDiv.innerHTML = `💢 ${data.message}`;
+                    showToast('💢', data.message, 'error');
+                }
             }
         } catch (error) {
             showToast('💢', '购买失败', 'error');
         }
     }
-    
+        
     // ==================== 4. 文法罗盘 ====================
     async function renderGrammarPanel() {
         try {
