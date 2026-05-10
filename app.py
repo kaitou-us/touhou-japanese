@@ -131,21 +131,39 @@ def get_card(card_id):
     return jsonify({"success": False, "message": "符卡未找到"}), 404
 
 # ---------- 2. 符卡对决 ----------
+# ---------- 对手系统 ----------
 
-@app.route('/api/duel', methods=['GET', 'POST'])
-def duel():
-    if request.method == 'POST':
-        user_input = request.json.get('spell_name', '') if request.is_json else ''
-        power = random.randint(100, 999)
-        outcome = random.choice(["完美发音！对手受到重创！", "发音可辨，弹幕互相抵消！", "言灵之力觉醒，胜利！"])
-        return jsonify({"success": True, "user_spell": user_input, "power": power, "outcome": outcome})
+@app.route('/api/opponents')
+def get_opponents():
+    """获取可选对手列表"""
+    opponents = [
+        {"id": "cirno", "name": "チルノ", "title": "湖上の氷精", "hp": 300, "emoji": "❄️", "color": "#00bcd4", "reward": 80},
+        {"id": "reimu", "name": "博麗霊夢", "title": "楽園の素敵な巫女", "hp": 600, "emoji": "🧙‍♀️", "color": "#e74c3c", "reward": 200},
+        {"id": "yukari", "name": "八雲紫", "title": "境界の妖怪", "hp": 999, "emoji": "🦊", "color": "#6c3483", "reward": 500},
+    ]
+    return jsonify({"success": True, "data": opponents})
+
+
+@app.route('/api/battle/reward', methods=['POST'])
+def battle_reward():
+    """战斗胜利发放奖励"""
+    user_token = request.json.get('token', '')
+    opponent_id = request.json.get('opponent_id', '')
     
-    duel_info = {
-        "player1": {"name": "灵梦", "spell": "霊符「夢想封印」", "emoji": "🧙‍♀️"},
-        "player2": {"name": "蕾米莉亚", "spell": "紅符「不夜城レッド」", "emoji": "🧛"},
-        "instruction": "请大声宣告你的符卡名称，以灵力震动结界"
-    }
-    return jsonify({"success": True, "data": duel_info})
+    rewards = {"cirno": 80, "reimu": 200, "yukari": 500}
+    saisen = rewards.get(opponent_id, 50)
+    
+    if user_token:
+        data, user = get_or_create_user(user_token)
+        if user:
+            if 'currencies' not in user:
+                user['currencies'] = {'靈珠': 0, '賽錢': 0, '信仰ポイント': 0}
+            user['currencies']['賽錢'] = user['currencies'].get('賽錢', 0) + saisen
+            if 'stats' in user:
+                user['stats']['total_duels_won'] = user['stats'].get('total_duels_won', 0) + 1
+            save_users_data(data)
+    
+    return jsonify({"success": True, "reward": saisen, "message": f"获得 {saisen} 賽錢！"})
 
 # ---------- 3. 河童杂货铺 ----------
 
