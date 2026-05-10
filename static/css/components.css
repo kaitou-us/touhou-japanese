@@ -871,3 +871,12 @@
         font-size: 1.3em;
     }
 }
+
+/* 语音状态 */
+.voice-status {
+    text-align: center;
+    padding: 10px;
+    min-height: 24px;
+    font-size: 0.9em;
+    animation: pulse 1.5s ease-in-out infinite;
+}
