@@ -8,16 +8,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ========== 第一步：用户登录检查 ==========
     const existingToken = localStorage.getItem('touhou_user_token');
     
-    if (existingToken) {
+       if (existingToken) {
         const loginSuccess = await autoLogin(existingToken);
         if (loginSuccess) {
             document.getElementById('welcomeOverlay').style.display = 'none';
         } else {
+            // 登录失败不弹邀请函，静默清除
             localStorage.removeItem('touhou_user_token');
-            showWelcomeScreen();
+            document.getElementById('welcomeOverlay').style.display = 'none';
         }
-    } else {
-        showWelcomeScreen();
     }
     
     // ========== 第二步：初始化特效 ==========
