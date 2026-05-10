@@ -25,34 +25,20 @@ const Challenges = (() => {
     /**
      * 更新任务进度
      */
-     async function updateProgress(taskType, amount = 1) {
-        var token = getToken();
-        if (!token) {
-            console.log('无token，跳过进度上报');
-            return;
-        }
+    async function updateProgress(taskType, amount = 1) {
+        const token = getToken();
+        if (!token) return;
         try {
-            var res = await fetch(window.location.origin + '/api/challenges/progress', {
+            await fetch(`${window.location.origin}/api/challenges/progress`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: token, task_type: taskType, amount: amount })
             });
-            var data = await res.json();
-            console.log('进度上报结果:', taskType, data);
-            
-            // 上报成功后立即刷新挑战面板
-            if (data.success) {
-                var panel = document.getElementById('challengePanelContainer');
-                if (panel) {
-                    var html = await renderChallengePanel();
-                    panel.innerHTML = html;
-                }
-            }
         } catch (e) {
             console.log('上报进度失败:', e);
         }
     }
-        /**
+    /**
      * 领取奖励
      */
     async function claimReward(taskId) {

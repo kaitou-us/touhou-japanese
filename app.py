@@ -803,43 +803,13 @@ def server_error(error):
     return jsonify({"success": False, "message": "结界发生异常波动，请稍后再试"}), 500
 
 # ==================== 启动时自动初始化 ====================
-
 def init_app():
-    """应用启动时自动初始化必要文件"""
-    # 确保 data 目录存在
     data_dir = BASE_DIR / 'data'
     data_dir.mkdir(parents=True, exist_ok=True)
     
-    # 确保 users.json 存在并有效
     if not USERS_FILE.exists():
-        print('📝 创建默认 users.json...')
-        default_data = {
-            "character_pool": [
-                {"id":"reimu","name":"博麗霊夢","title":"楽園の素敵な巫女","rarity":"SSR","emoji":"🧙‍♀️","color":"#e74c3c","description":"博丽神社的巫女","starter_card":"霊符「夢想封印」","starter_currency":{"靈珠":120,"賽錢":300,"信仰ポイント":80}},
-                {"id":"marisa","name":"霧雨魔理沙","title":"普通の魔法使い","rarity":"SSR","emoji":"🧹","color":"#f39c12","description":"普通的魔法使","starter_card":"恋符「マスタースパーク」","starter_currency":{"靈珠":100,"賽錢":250,"信仰ポイント":60}},
-                {"id":"cirno","name":"チルノ","title":"湖上の氷精","rarity":"R","emoji":"❄️","color":"#00bcd4","description":"雾之湖的冰之妖精","starter_card":"氷符「アイシクルフォール」","starter_currency":{"靈珠":30,"賽錢":100,"信仰ポイント":15}},
-            ],
-            "users": {}
-        }
         with open(USERS_FILE, 'w', encoding='utf-8') as f:
-            json.dump(default_data, f, ensure_ascii=False, indent=2)
-        print('✅ users.json 已创建')
-    else:
-        # 文件存在，检查角色池
-        try:
-            with open(USERS_FILE, 'r', encoding='utf-8') as f:
-                d = json.load(f)
-            if not d.get('character_pool'):
-                d['character_pool'] = [
-                    {"id":"reimu","name":"博麗霊夢","title":"楽園の素敵な巫女","rarity":"SSR","emoji":"🧙‍♀️","color":"#e74c3c","description":"博丽神社的巫女","starter_card":"霊符「夢想封印」","starter_currency":{"靈珠":120,"賽錢":300,"信仰ポイント":80}},
-                    {"id":"marisa","name":"霧雨魔理沙","title":"普通の魔法使い","rarity":"SSR","emoji":"🧹","color":"#f39c12","description":"普通的魔法使","starter_card":"恋符「マスタースパーク」","starter_currency":{"靈珠":100,"賽錢":250,"信仰ポイント":60}},
-                    {"id":"cirno","name":"チルノ","title":"湖上の氷精","rarity":"R","emoji":"❄️","color":"#00bcd4","description":"雾之湖的冰之妖精","starter_card":"氷符「アイシクルフォール」","starter_currency":{"靈珠":30,"賽錢":100,"信仰ポイント":15}},
-                ]
-                with open(USERS_FILE, 'w', encoding='utf-8') as f:
-                    json.dump(d, f, ensure_ascii=False, indent=2)
-                print('✅ 角色池已修复')
-        except:
-            pass
+            json.dump({"users": {}}, f)
 
 
 # ==================== 启动 ====================
