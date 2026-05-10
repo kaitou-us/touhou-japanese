@@ -119,21 +119,25 @@ const Challenges = (() => {
      * 领取奖励并刷新
      */
 async function claimAndRefresh(taskId) {
-    const result = await claimReward(taskId);
+    var result = await claimReward(taskId);
     if (result && result.success) {
-        Panels.showToast('🎁', '领取成功！ +' + (result.reward?.saisen || 0) + '賽錢', 'success');
+        // 显示奖励
+        var rei = result.reward?.rei || 0;
+        var saisen = result.reward?.saisen || 0;
+        Panels.showToast('🎁', '领取成功！靈珠 +' + rei + ' 賽錢 +' + saisen, 'success');
         
-        // 立即刷新面板
-        const panel = document.getElementById('challengePanelContainer');
+        // 刷新挑战面板
+        var panel = document.getElementById('challengePanelContainer');
         if (panel) {
-            const html = await renderChallengePanel();
-            panel.innerHTML = html;
+            panel.innerHTML = await renderChallengePanel();
         }
         
-        // 刷新货币
+        // 刷新头部货币显示
         if (window.loadUserHeader) {
             await window.loadUserHeader();
         }
+    } else {
+        Panels.showToast('💢', result?.message || '领取失败', 'error');
     }
 }
     /**
