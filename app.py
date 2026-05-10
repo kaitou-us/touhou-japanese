@@ -417,7 +417,7 @@ def add_favorite():
     save_users_data(data)
     return jsonify({"success": True, "message": f"已收藏「{word}」！"})
 
-    
+
 @app.route('/api/favorites/remove', methods=['POST'])
 def remove_favorite():
     """取消收藏"""
@@ -444,6 +444,93 @@ def remove_favorite():
         return jsonify({"success": True, "message": "已取消收藏"})
     else:
         return jsonify({"success": False, "message": "未找到该收藏"})
+
+
+# ---------- 每日挑战 ----------
+
+@app.route('/api/challenges')
+def get_challenges():
+    """获取今日挑战"""
+    user_token = request.args.get('token', '')
+    data, user = get_or_create_user(user_token)
+    if not user:
+        return jsonify({"success": False, "message": "请先登录"}), 401
+    
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    
+    # 初始化或刷新挑战
+    if 'challenges' not in user or user.get('challenge_date') != today:
+        user['challenges'] = [
+            {"id": "1", "task_type": "draw_card", "name": "抽卡修行", "description": "抽取3张符卡", "target": 3, "current": 0, "completed": False, "claimed": False, "reward_rei": 0, "reward_saisen": 50},
+            {"id": "2", "task_type": "learn_word", "name": "词汇学习", "description": "学习5个新单词", "target": 5, "current": 0, "completed": False, "claimed": False, "reward_rei": 1, "reward_saisen": 100},
+            {"id": "3", "task_type": "draw_card", "name": "SSR猎人", "description": "抽到1张SSR符卡", "target": 1, "current": 0, "completed": False, "claimed": False, "reward_rei": 2, "reward_saisen": 200},
+        ]
+        user['challenge_date'] = today
+        save_users_data(data)
+    
+    return jsonify({
+        "success": True,
+        "date": today,
+        "data": user['challenges']
+    })
+
+
+@app.route('/api/challenges/progress', methods=['POST'])
+def update_challenge_progress():
+    """更新挑战进度"""
+    user_token = request.json.get('token', '')
+    task_type = request.json.get('task_type', '')
+    amount = request.json.get('amount', 1)
+    
+    data, user = get_or_create_user(user_token)
+    if not user:
+        return jsonify({"success": False, "message": "请先登录"}), 401
+    
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    if user.get('challenge_date') != today:
+        return jsonify({"success": False, "message": "挑战已过期"})
+    
+    for challenge in user.get('challenges', []):
+        if challenge['task_type'] == task_type and not challenge['completed']:
+            challenge['current'] = min(challenge['current'] + amount, challenge['target'])
+            if challenge['current'] >= challenge['target']:
+                challenge['completed'] = True
+    
+    save_users_data(data)
+    return jsonify({"success": True})
+
+
+@app.route('/api/challenges/claim', methods=['POST'])
+def claim_challenge_reward():
+    """领取挑战奖励"""
+    user_token = request.json.get('token', '')
+    task_id = request.json.get('task_id', '')
+    
+    data, user = get_or_create_user(user_token)
+    if not user:
+        return jsonify({"success": False, "message": "请先登录"}), 401
+    
+    for challenge in user.get('challenges', []):
+        if challenge['id'] == task_id and challenge['completed'] and not challenge['claimed']:
+            challenge['claimed'] = True
+            
+            # 发放奖励
+            rei = challenge.get('reward_rei', 0)
+            saisen = challenge.get('reward_saisen', 0)
+            
+            if 'currencies' not in user:
+                user['currencies'] = {'靈珠': 0, '賽錢': 0, '信仰ポイント': 0}
+            user['currencies']['靈珠'] = user['currencies'].get('靈珠', 0) + rei
+            user['currencies']['賽錢'] = user['currencies'].get('賽錢', 0) + saisen
+            
+            save_users_data(data)
+            return jsonify({
+                "success": True,
+                "message": "奖励已领取！",
+                "reward": {"rei": rei, "saisen": saisen}
+            })
+    
+    return jsonify({"success": False, "message": "无法领取"})
 
 
 # ==================== 搜索系统 ====================

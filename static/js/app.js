@@ -35,11 +35,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupModalClose();
     setupClock();
     setupKeyboardShortcuts();
-    setupJLPTToggle();
+    initJLPTToggle();
     
     // ========== 第六步：加载用户头部信息 ==========
     if (existingToken) {
         await loadUserHeader();
+        // 加载每日挑战
+        await loadChallenges();
     }
     
     console.log('✅ 初始化完成 - "言灵即是力量"');
@@ -651,3 +653,18 @@ function initJLPTToggle() {
 }
 
 window.toggleJLPT = toggleJLPT;
+
+// 加载每日挑战面板
+async function loadChallenges() {
+    // 等待一小段时间确保 Challenges 模块加载
+    await new Promise(r => setTimeout(r, 500));
+    
+    const container = document.getElementById('challengePanelContainer');
+    if (container && window.Challenges) {
+        try {
+            container.innerHTML = await Challenges.renderChallengePanel();
+        } catch (e) {
+            console.log('挑战面板加载失败:', e);
+        }
+    }
+}

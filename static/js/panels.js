@@ -183,6 +183,11 @@ async function renderCardPanel() {
                     <div class="rarity-badge">
                         ${'★'.repeat(card.rarity === 'SSR' ? 5 : card.rarity === 'SR' ? 4 : 3)} ${card.rarity}
                     </div>
+                    <div class="favorite-btn" id="favBtn" onclick="event.stopPropagation(); Favorites.toggleFavorite({id: ${card.id}, word: '${card.word}', reading: '${card.reading || ''}',
+                     meaning: '${card.meaning || ''}', rarity: '${card.rarity}', level: '${card.level || ''}'}).then(function(result) { document.getElementById('favBtn').textContent = result ? '⭐' : '☆';
+                    document.getElementById('favBtn').classList.toggle('favorited', result); })">
+                        ☆
+                    </div>
                     <div class="card-level">${card.level || ''}</div>
                     <div class="card-word">${card.word}</div>
                     <div class="card-reading">${readingDisplay}</div>
@@ -213,10 +218,16 @@ async function renderCardPanel() {
 async function refreshCard() {
     try {
         var result = await getFilteredRandomCard();
+        
+        if (!result || !result.success) {
+            Panels.showToast('💢', result?.message || '抽卡失败', 'error');
+            return;
+        }
+        
         var card = result.data;
         var display = document.getElementById('ofudaCard');
         
-        if (display) {
+        if (display && card) {
             var readingText = card.reading || '';
             var readingDisplay = readingText;
             
@@ -240,18 +251,32 @@ async function refreshCard() {
             
             Effects.cardFlipEffect(display);
             Panels.showToast('🎴', '抽到了 ' + card.rarity + ' 级言灵：' + card.word);
+            
+            // 更新每日挑战进度
+            if (window.Challenges) {
+                Challenges.updateProgress('draw_card', 1);
+                Challenges.updateProgress('learn_word', 1);
+                if (card.rarity === 'SSR') {
+                    Challenges.updateProgress('draw_card', 1);
+                }
+            }
         }
     } catch (error) {
         Panels.showToast('💢', '抽卡失败，请重试', 'error');
     }
 }
-    
     // ==================== 2. 符卡对决 ====================
     async function renderDuelPanel() {
         try {
             const result = await API.getDuelInfo();
             const duel = result.data;
-            
+
+
+            // 新增：更新每日挑战进度
+            if (window.Challenges) {
+                Challenges.updateProgress('learn_word', 1);
+            }
+                
             return `
                 <div class="modal-header">
                     <div class="modal-title" style="font-size:1.6em;color:var(--color-gold);text-align:center;">

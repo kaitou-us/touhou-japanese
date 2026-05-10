@@ -1,0 +1,220 @@
+/* ==========================================
+   每日挑战样式
+   ========================================== */
+
+.challenge-panel {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-gold);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.challenge-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ffd700, #ff6b6b, #ffd700);
+}
+
+.challenge-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.challenge-title {
+    color: var(--text-gold);
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.challenge-date {
+    color: var(--text-muted);
+    font-size: 0.85em;
+}
+
+/* 进度条 */
+.challenge-progress {
+    margin-bottom: 16px;
+}
+
+.progress-bar-outer {
+    width: 100%;
+    height: 8px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd700, #ff8c00);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    color: var(--text-muted);
+    font-size: 0.8em;
+    margin-top: 4px;
+    text-align: right;
+}
+
+/* 任务列表 */
+.challenge-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.challenge-item {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all var(--transition-fast);
+}
+
+.challenge-item.completed {
+    border-color: #5a5;
+    background: rgba(40,140,40,0.1);
+    opacity: 0.8;
+}
+
+.challenge-item.completed .challenge-icon {
+    background: rgba(40,140,40,0.3);
+}
+
+.challenge-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(180,40,40,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3em;
+    flex-shrink: 0;
+}
+
+.challenge-info {
+    flex: 1;
+}
+
+.challenge-name {
+    color: var(--text-primary);
+    font-size: 0.95em;
+}
+
+.challenge-desc {
+    color: var(--text-muted);
+    font-size: 0.8em;
+}
+
+.challenge-reward {
+    color: #ffd700;
+    font-size: 0.85em;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.challenge-status {
+    font-size: 1.2em;
+    flex-shrink: 0;
+}
+
+.challenge-status.done {
+    color: #5a5;
+}
+
+.challenge-status.pending {
+    color: var(--text-muted);
+}
+
+/* 领取按钮 */
+.btn-claim {
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: #3d2000;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--font-cn);
+    font-size: 0.85em;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn-claim:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(255,215,0,0.4);
+}
+
+.btn-claim:disabled {
+    background: #555;
+    color: #999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 完成弹窗 */
+.reward-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 200;
+    background: var(--bg-modal);
+    border: 2px solid #ffd700;
+    border-radius: var(--radius-lg);
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(255,215,0,0.5);
+    animation: scaleIn 0.4s ease-out;
+}
+
+.reward-popup .reward-icon {
+    font-size: 4em;
+    display: block;
+    animation: gentleFloat 2s ease-in-out infinite;
+}
+
+.reward-popup .reward-text {
+    color: #ffd700;
+    font-size: 1.3em;
+    margin: 10px 0;
+}
+
+.reward-popup .reward-amount {
+    color: var(--text-primary);
+    font-size: 1.1em;
+}
+
+/* 移动端 */
+@media (max-width: 768px) {
+    .challenge-panel {
+        padding: 14px;
+    }
+    .challenge-item {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+    .challenge-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1em;
+    }
+}

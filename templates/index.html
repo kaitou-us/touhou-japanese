@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/inventory.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/challenges.css') }}">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -137,6 +138,9 @@
             <div style="color:var(--text-muted);font-size:0.8em;">点击打开背包 →</div>
         </div>
 
+        <!-- 每日挑战面板 -->
+        <div id="challengePanelContainer" style="margin-bottom: 20px;"></div>
+
         <!-- 六大板块 -->
         <section class="panels-section" id="panelsSection">
             <div class="section-header">
@@ -199,7 +203,10 @@
     <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
     <script src="{{ url_for('static', filename='js/panels.js') }}"></script>
     <script src="{{ url_for('static', filename='js/inventory.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/challenges.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/favorites.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    
 
     <script>
     (function() {
