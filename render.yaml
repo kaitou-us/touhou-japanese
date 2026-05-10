@@ -2,8 +2,9 @@ services:
   - type: web
     name: touhou-japanese
     env: python
+    region: singapore
     buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    startCommand: bash scripts/init_render.sh && python app.py
     envVars:
       - key: FLASK_ENV
         value: production
