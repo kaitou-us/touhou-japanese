@@ -329,6 +329,7 @@ async function confirmRegistration() {
             }, 500);
             
             setTimeout(loadUserHeader, 1000);
+            setTimeout(loadChallenges, 1500);  // ← 确保这行存在
         } else {
             alert('注册失败：' + (data.message || '未知错误'));
         }
