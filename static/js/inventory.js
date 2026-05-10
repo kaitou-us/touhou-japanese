@@ -100,7 +100,21 @@ const Inventory = (() => {
                         ⚔️ 装备 (${overview.data.equipment_count})
                     </button>
                 </div>
-                
+                <div class="inventory-tabs">
+                    <button class="inventory-tab active" onclick="Inventory.switchTab('spellcards')">
+                        📜 符卡
+                    </button>
+                    <button class="inventory-tab" onclick="Inventory.switchTab('items')">
+                        🎒 道具
+                    </button>
+                    <button class="inventory-tab" onclick="Inventory.switchTab('equipment')">
+                        ⚔️ 装备
+                    </button>
+                    <button class="inventory-tab" onclick="Inventory.switchTab('favorites')">
+                        ⭐ 收藏
+                    </button>
+                </div>
+                    
                 <!-- 内容区域 -->
                 <div id="inventoryContent">
                     ${await renderSpellcardsTab()}
@@ -114,37 +128,36 @@ const Inventory = (() => {
     /**
      * 切换标签
      */
-    async function switchTab(tabName) {
-        // 更新标签状态
-        document.querySelectorAll('.inventory-tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        
-        // 给当前点击的标签添加 active
-        const clickedTab = document.querySelector(`.inventory-tab[onclick*="${tabName}"]`);
-        if (clickedTab) {
-            clickedTab.classList.add('active');
-        }
-        
-        // 切换内容
-        const content = document.getElementById('inventoryContent');
-        if (!content) return;
-        
-        content.innerHTML = '<div style="text-align:center;padding:30px;"><div class="loading-spinner"></div></div>';
-        
-        switch(tabName) {
-            case 'spellcards':
-                content.innerHTML = await renderSpellcardsTab();
-                break;
-            case 'items':
-                content.innerHTML = await renderItemsTab();
-                break;
-            case 'equipment':
-                content.innerHTML = await renderEquipmentTab();
-                break;
-        }
+async function switchTab(tabName) {
+    document.querySelectorAll('.inventory-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // 高亮当前选中的标签
+    const clickedTab = document.querySelector(`.inventory-tab[onclick*="${tabName}"]`);
+    if (clickedTab) {
+        clickedTab.classList.add('active');
     }
     
+    const content = document.getElementById('inventoryContent');
+    if (!content) return;
+    
+    // 直接替换内容，不显示加载动画
+    switch(tabName) {
+        case 'spellcards':
+            content.innerHTML = await renderSpellcardsTab();
+            break;
+        case 'items':
+            content.innerHTML = await renderItemsTab();
+            break;
+        case 'equipment':
+            content.innerHTML = await renderEquipmentTab();
+            break;
+        case 'favorites':
+            content.innerHTML = await Favorites.renderFavoritesTab();
+            break;
+    }
+}
     /**
      * 渲染符卡标签
      */
