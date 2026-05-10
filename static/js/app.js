@@ -6,17 +6,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('🏮 幻想郷 言霊修行帳 - 初始化开始');
     
     // ========== 第一步：用户登录检查 ==========
-    const existingToken = localStorage.getItem('touhou_user_token');
+       const existingToken = localStorage.getItem('touhou_user_token');
     
-       if (existingToken) {
+    if (existingToken) {
         const loginSuccess = await autoLogin(existingToken);
         if (loginSuccess) {
             document.getElementById('welcomeOverlay').style.display = 'none';
         } else {
-            // 登录失败不弹邀请函，静默清除
             localStorage.removeItem('touhou_user_token');
-            document.getElementById('welcomeOverlay').style.display = 'none';
+            showWelcomeScreen();  // token无效，显示邀请函
         }
+    } else {
+        showWelcomeScreen();  // 无token，显示邀请函
     }
     
     // ========== 第二步：初始化特效 ==========
