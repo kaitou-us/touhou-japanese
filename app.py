@@ -36,12 +36,40 @@ def load_data():
         }
 
 def load_users_data():
-    """加载用户数据"""
+    """加载用户数据，文件缺失时自动初始化"""
+    # 确保目录存在
+    USERS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    
+    # 如果文件不存在，创建默认文件
+    if not USERS_FILE.exists():
+        default_pool = [
+            {"id":"reimu","name":"博麗霊夢","title":"楽園の素敵な巫女","rarity":"SSR","emoji":"🧙‍♀️","color":"#e74c3c","description":"博丽神社的巫女","starter_card":"霊符「夢想封印」","starter_currency":{"靈珠":120,"賽錢":300,"信仰ポイント":80}},
+            {"id":"marisa","name":"霧雨魔理沙","title":"普通の魔法使い","rarity":"SSR","emoji":"🧹","color":"#f39c12","description":"普通的魔法使","starter_card":"恋符「マスタースパーク」","starter_currency":{"靈珠":100,"賽錢":250,"信仰ポイント":60}},
+            {"id":"cirno","name":"チルノ","title":"湖上の氷精","rarity":"R","emoji":"❄️","color":"#00bcd4","description":"雾之湖的冰之妖精","starter_card":"氷符「アイシクルフォール」","starter_currency":{"靈珠":30,"賽錢":100,"信仰ポイント":15}},
+        ]
+        data = {"character_pool": default_pool, "users": {}}
+        with open(USERS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        return data
+    
+    # 文件存在，读取
     try:
         with open(USERS_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {"character_pool": [], "users": {}}
+            data = json.load(f)
+    except:
+        data = {"character_pool": [], "users": {}}
+    
+    # 修复空角色池
+    if not data.get('character_pool'):
+        data['character_pool'] = [
+            {"id":"reimu","name":"博麗霊夢","title":"楽園の素敵な巫女","rarity":"SSR","emoji":"🧙‍♀️","color":"#e74c3c","description":"博丽神社的巫女","starter_card":"霊符「夢想封印」","starter_currency":{"靈珠":120,"賽錢":300,"信仰ポイント":80}},
+            {"id":"marisa","name":"霧雨魔理沙","title":"普通の魔法使い","rarity":"SSR","emoji":"🧹","color":"#f39c12","description":"普通的魔法使","starter_card":"恋符「マスタースパーク」","starter_currency":{"靈珠":100,"賽錢":250,"信仰ポイント":60}},
+            {"id":"cirno","name":"チルノ","title":"湖上の氷精","rarity":"R","emoji":"❄️","color":"#00bcd4","description":"雾之湖的冰之妖精","starter_card":"氷符「アイシクルフォール」","starter_currency":{"靈珠":30,"賽錢":100,"信仰ポイント":15}},
+        ]
+        with open(USERS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    
+    return data
 
 def save_users_data(data):
     """保存用户数据"""
@@ -787,8 +815,7 @@ def init_app():
         except:
             pass
 
-# 启动时执行
-init_app()
+
 # ==================== 启动 ====================
 
 if __name__ == '__main__':
