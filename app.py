@@ -268,10 +268,23 @@ def culture():
 
 @app.route('/api/user/character_pool')
 def character_pool():
-    data = load_users_data()
-    pool = data.get('character_pool', [])
-    preview = [{"id": c['id'], "name": c['name'], "emoji": c['emoji'], "title": c['title']} for c in pool]
-    return jsonify({"success": True, "data": preview, "total": len(pool)})
+    pool = load_character_pool()
+
+    preview = [
+        {
+            "id": c['id'],
+            "name": c['name'],
+            "emoji": c['emoji'],
+            "title": c['title']
+        }
+        for c in pool
+    ]
+
+    return jsonify({
+        "success": True,
+        "data": preview,
+        "total": len(pool)
+    })
     
 @app.route('/api/user/draw_character', methods=['POST'])
 def draw_character():
