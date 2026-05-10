@@ -831,3 +831,43 @@
         font-size: 16px; /* 防止 iOS 自动缩放 */
     }
 }
+
+/* ==========================================
+   收藏功能样式
+   ========================================== */
+
+/* 符卡收藏按钮 */
+.fav-star-btn {
+    position: absolute;
+    top: 10px;
+    right: 75px;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #ccc;
+    transition: all 0.3s ease;
+    z-index: 5;
+    padding: 4px 8px;
+    line-height: 1;
+}
+
+.fav-star-btn:hover {
+    transform: scale(1.3);
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.fav-star-btn.favorited {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* 移动端收藏按钮 */
+@media (max-width: 768px) {
+    .fav-star-btn {
+        top: 6px;
+        right: 60px;
+        font-size: 1.3em;
+    }
+}
