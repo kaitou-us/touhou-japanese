@@ -272,23 +272,40 @@ def character_pool():
     pool = data.get('character_pool', [])
     preview = [{"id": c['id'], "name": c['name'], "emoji": c['emoji'], "title": c['title']} for c in pool]
     return jsonify({"success": True, "data": preview, "total": len(pool)})
-
+    
 @app.route('/api/user/draw_character', methods=['POST'])
 def draw_character():
     try:
-        data = load_users_data()
-        pool = data.get('character_pool', [])
+        pool = load_character_pool()
+
         if not pool:
-            return jsonify({"success": False, "message": "角色池为空"}), 500
+            return jsonify({
+                "success": False,
+                "message": "角色池为空"
+            }), 500
+
         character = random.choice(pool)
-        return jsonify({"success": True, "data": {
-            "id": character['id'], "name": character['name'], "title": character['title'],
-            "rarity": character['rarity'], "emoji": character['emoji'], "color": character['color'],
-            "description": character['description'], "starter_card": character['starter_card'],
-            "starter_currency": character['starter_currency']
-        }})
+
+        return jsonify({
+            "success": True,
+            "data": {
+                "id": character['id'],
+                "name": character['name'],
+                "title": character['title'],
+                "rarity": character['rarity'],
+                "emoji": character['emoji'],
+                "color": character['color'],
+                "description": character['description'],
+                "starter_card": character['starter_card'],
+                "starter_currency": character['starter_currency']
+            }
+        })
+
     except Exception as e:
-        return jsonify({"success": False, "message": f"抽取失败: {str(e)}"}), 500
+        return jsonify({
+            "success": False,
+            "message": f"抽取失败: {str(e)}"
+        }), 500
 
 @app.route('/api/user/register', methods=['POST'])
 def register_user():
