@@ -1,0 +1,12 @@
+[
+    {"id":"reimu","name":"博麗霊夢","title":"楽園の素敵な巫女","rarity":"SSR","emoji":"🧙‍♀️","color":"#e74c3c","description":"博丽神社的巫女","starter_card":"霊符「夢想封印」","starter_currency":{"靈珠":120,"賽錢":300,"信仰ポイント":80}},
+    {"id":"marisa","name":"霧雨魔理沙","title":"普通の魔法使い","rarity":"SSR","emoji":"🧹","color":"#f39c12","description":"普通的魔法使","starter_card":"恋符「マスタースパーク」","starter_currency":{"靈珠":100,"賽錢":250,"信仰ポイント":60}},
+    {"id":"yukari","name":"八雲紫","title":"境界の妖怪","rarity":"SSR","emoji":"🦊","color":"#6c3483","description":"境界的大妖怪","starter_card":"境符「二次元と三次元の境界」","starter_currency":{"靈珠":150,"賽錢":500,"信仰ポイント":100}},
+    {"id":"sakuya","name":"十六夜咲夜","title":"完全で瀟洒な従者","rarity":"SR","emoji":"🗡️","color":"#3498db","description":"红魔馆的女仆长","starter_card":"幻符「殺人ドール」","starter_currency":{"靈珠":70,"賽錢":400,"信仰ポイント":40}},
+    {"id":"alice","name":"アリス·マーガトロイド","title":"七色の人形使い","rarity":"SR","emoji":"🎎","color":"#9b59b6","description":"人形使","starter_card":"操符「ドールズインシー」","starter_currency":{"靈珠":80,"賽錢":350,"信仰ポイント":45}},
+    {"id":"aya","name":"射命丸文","title":"伝統の幻想ブン屋","rarity":"SR","emoji":"📸","color":"#e67e22","description":"天狗记者","starter_card":"風符「風神一扇」","starter_currency":{"靈珠":60,"賽錢":300,"信仰ポイント":35}},
+    {"id":"youmu","name":"魂魄妖夢","title":"半人半霊の庭師","rarity":"SR","emoji":"👻","color":"#27ae60","description":"白玉楼的庭师","starter_card":"剣技「桜花閃々」","starter_currency":{"靈珠":65,"賽錢":280,"信仰ポイント":35}},
+    {"id":"cirno","name":"チルノ","title":"湖上の氷精","rarity":"R","emoji":"❄️","color":"#00bcd4","description":"雾之湖的冰之妖精","starter_card":"氷符「アイシクルフォール」","starter_currency":{"靈珠":30,"賽錢":100,"信仰ポイント":15}},
+    {"id":"reisen","name":"鈴仙·優曇華院·イナバ","title":"月の兎","rarity":"R","emoji":"🐰","color":"#e91e63","description":"永远亭的月兔","starter_card":"幻波「赤眼催眠」","starter_currency":{"靈珠":40,"賽錢":180,"信仰ポイント":25}},
+    {"id":"patchouli","name":"パチュリー·ノーレッジ","title":"動かない大図書館","rarity":"R","emoji":"📚","color":"#8e44ad","description":"红魔馆的魔女","starter_card":"火符「アグニシャイン」","starter_currency":{"靈珠":90,"賽錢":150,"信仰ポイント":50}}
+]
