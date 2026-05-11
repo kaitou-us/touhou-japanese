@@ -214,7 +214,7 @@ const Panels = (() => {
         
         for (var key in OPPONENTS) {
             var o = OPPONENTS[key];
-            html += '<div class="opponent-card" id="opp_' + o.id + '" onclick="Panels.startBattle(\'' + o.id + '\')"><span class="opponent-emoji">' + o.emoji + '</span><div class="opponent-name">' + o.name + '</div><div class="opponent-hp">❤️ HP: ' + o.hp + '</div><div class="opponent-reward">💰 赏金: ' + o.reward + ' 賽錢</div></div>';
+            html += '<div class="opponent-card" id="opp_' + o.id + '" onclick="Panels.startBattle(\'' + o.id + '\')"><img src="/static/images/opponents/' + o.id + '_normal.png" style="width:100px;height:auto;"><div class="opponent-name">' + o.name + '</div><div class="opponent-hp">❤️ HP: ' + o.hp + '</div><div class="opponent-reward">💰 赏金: ' + o.reward + ' 賽錢</div></div>';
         }
         
         html += '<p style="text-align:center;color:#887060;font-size:0.8em;margin-top:10px;">需要先抽取符卡才能开始战斗</p>';
@@ -267,7 +267,9 @@ const Panels = (() => {
         var body = document.getElementById('modalBody');
         var opp = currentOpponent;
         body.innerHTML = '<div class="modal-header"><div class="modal-title" style="font-size:1.4em;color:var(--color-gold);text-align:center;">⚔️ VS ' + opp.name + '</div></div>' +
-            '<div class="battle-arena"><div class="battle-opponent-zone"><span class="battle-opponent-emoji" id="oppEmoji">' + opp.emoji + '</span><div style="color:var(--text-gold);">' + opp.name + '</div><div class="hp-bar-outer"><div class="hp-bar-inner" id="hpBar" style="width:' + (currentOpponentHP / currentOpponentMaxHP * 100) + '%"></div></div><div class="hp-text" id="hpText">❤️ ' + currentOpponentHP + ' / ' + currentOpponentMaxHP + '</div></div>' +
+            '<div class="battle-arena"><div class="battle-opponent-zone">' +
+            '<img id="oppImage" src="/static/images/opponents/' + opp.id + '_normal.png" style="width:120px;height:auto;transition:0.3s;">' +
+            '<div style="color:var(--text-gold);">' + opp.name + '</div><div class="hp-bar-outer"><div class="hp-bar-inner" id="hpBar" style="width:' + (currentOpponentHP / currentOpponentMaxHP * 100) + '%"></div></div><div class="hp-text" id="hpText">❤️ ' + currentOpponentHP + ' / ' + currentOpponentMaxHP + '</div></div>' +
             '<div class="battle-hand-zone"><div id="cardArea" style="text-align:center;min-height:120px;"></div>' +
             '<div style="text-align:center;margin-top:20px;"><button class="btn btn-primary btn-lg" id="fightBtn" onclick="Panels.revealCard()">⚡ 战斗</button></div></div></div>' +
             '<div style="text-align:center;margin-top:15px;"><button class="btn btn-ghost" onclick="Panels.renderDuelPanel().then(function(h){document.getElementById(\'modalBody\').innerHTML=h;})">🔙 返回</button></div>';
@@ -303,43 +305,50 @@ const Panels = (() => {
         document.getElementById('fightBtn').disabled = true;
         document.getElementById('fightBtn').textContent = '🎴 点击符卡攻击';
     }
-
-    // 点击符卡：显示假名 + 造成伤害
+    // 点击符卡攻击：显示符卡的假名，扣除血量，显示伤害数字
     function attackAndShowReading() {
         var card = battleDrawnCards[currentCardIndex];
         card.revealed = true;
         card.used = true;
-        
         // 显示假名
         document.getElementById('readingSpot').textContent = card.reading || card.word;
         
-        // 计算伤害
         var damage = DAMAGE_MAP[card.rarity] || 50;
         currentOpponentHP = Math.max(0, currentOpponentHP - damage);
-        
-        // 更新HP
+        // 更新血条
         document.getElementById('hpBar').style.width = (currentOpponentHP / currentOpponentMaxHP * 100) + '%';
         document.getElementById('hpText').textContent = '❤️ ' + currentOpponentHP + ' / ' + currentOpponentMaxHP;
-        
-        // 禁用卡片点击
+        // 禁用符卡，显示伤害数字
         document.getElementById('cardArea').querySelector('.hand-card').onclick = null;
         document.getElementById('cardArea').querySelector('.hand-card').style.opacity = '0.5';
         document.getElementById('cardArea').querySelector('.hand-card').style.cursor = 'default';
         
-        // 显示伤害数字
-        showDamageNumber(damage);
-        
-        // 恢复战斗按钮
         document.getElementById('fightBtn').disabled = false;
         document.getElementById('fightBtn').textContent = '⚡ 战斗';
-        
-        // 检查胜负
+        // 显示伤害数字
+        showDamageNumber(damage);
+
+        // 根据稀有度切换表情
+        var oppImage = document.getElementById('oppImage');
+        if (oppImage) {
+            if (currentOpponentHP <= 0) {
+                oppImage.src = '/static/images/opponents/' + currentOpponent.id + '_angry.png';
+            } else if (card.rarity === 'SSR') {
+                oppImage.src = '/static/images/opponents/' + currentOpponent.id + '_cry.png';
+            } else if (card.rarity === 'SR') {
+                oppImage.src = '/static/images/opponents/' + currentOpponent.id + '_sad.png';
+            } else {
+                oppImage.src = '/static/images/opponents/' + currentOpponent.id + '_surprised.png';
+            }
+        }
+
         if (currentOpponentHP <= 0) {
-            setTimeout(function() { endBattle(true); }, 800);
+            setTimeout(function() { endBattle(true); }, 1200);
         } else {
             var allUsed = battleDrawnCards.every(function(c) { return c.used; });
             if (allUsed) {
-                setTimeout(function() { endBattle(false); }, 800);
+                if (oppImage) oppImage.src = '/static/images/' + currentOpponent.id + '_angry.png';
+                setTimeout(function() { endBattle(false); }, 1200);
             }
         }
     }
@@ -502,7 +511,8 @@ const Panels = (() => {
         buyItem, toggleDanmakuWord, checkDanmaku, resetDanmaku, newDanmaku,
         performBow, showToast,
         drawBattleCards, showHandCards, startBattle, revealCard, attackAndShowReading,
-        renderDuelPanel, renderBattleScreen2
+        renderDuelPanel, renderBattleScreen2,battleDrawnCards,currentOpponent,currentOpponentHP,
+        currentOpponentMaxHP
     };
 })();
 

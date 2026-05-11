@@ -231,7 +231,7 @@ const Panels = (() => {
         
         for (var i = 0; i < opponents.length; i++) {
             var o = opponents[i];
-            html += '<div class="opponent-card" id="opp_' + o.id + '"><span class="opponent-emoji">' + o.emoji + '</span><div class="opponent-name">' + o.name + '</div><div class="opponent-hp">❤️ HP: ' + o.hp + '</div><div class="opponent-reward">💰 赏金: ' + o.reward + ' 賽錢</div></div>';
+            html += '<div class="opponent-card" id="opp_' + o.id + '" onclick="Panels.startBattle(\'' + o.id + '\')"><img src="/static/images/opponents/' + o.id + '_normal.png" style="width:100px;height:auto;"><div class="opponent-name">' + o.name + '</div><div class="opponent-hp">❤️ HP: ' + o.hp + '</div><div class="opponent-reward">💰 赏金: ' + o.reward + ' 賽錢</div></div>';
         }
         
         html += '<p style="text-align:center;color:#887060;font-size:0.8em;margin-top:10px;">需要先抽取符卡才能开始战斗</p>';
