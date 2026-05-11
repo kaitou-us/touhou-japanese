@@ -116,7 +116,31 @@ const Panels = (() => {
                 default: content = '<p>未知的板块...</p>';
             }
             body.innerHTML = content;
-            
+            // 为对决面板绑定事件
+            if (id === 2) {
+                setTimeout(function() {
+                    var cards = document.querySelectorAll('.opponent-card');
+                    for (var i = 0; i < cards.length; i++) {
+                        cards[i].style.cursor = 'pointer';
+                        cards[i].onclick = function() {
+                            var oppId = this.id.replace('opp_', '');
+                            if (oppId === 'cirno') {
+                                Battle.setOpponent({id:'cirno', hp:300, emoji:'❄️'});
+                                Battle.setHandCards(battleDrawnCards.slice());
+                                renderBattleScreen({id:'cirno', hp:300, emoji:'❄️'});
+                            } else if (oppId === 'reimu') {
+                                Battle.setOpponent({id:'reimu', hp:600, emoji:'🧙‍♀️'});
+                                Battle.setHandCards(battleDrawnCards.slice());
+                                renderBattleScreen({id:'reimu', hp:600, emoji:'🧙‍♀️'});
+                            } else if (oppId === 'yukari') {
+                                Battle.setOpponent({id:'yukari', hp:999, emoji:'🦊'});
+                                Battle.setHandCards(battleDrawnCards.slice());
+                                renderBattleScreen({id:'yukari', hp:999, emoji:'🦊'});
+                            }
+                        };
+                    }
+                }, 800);
+            }
             const danmakuZone = body.querySelector('.danmaku-zone');
             if (danmakuZone) Effects.createDanmakuEffect(danmakuZone, 5);
         } catch (error) {
@@ -195,34 +219,43 @@ const Panels = (() => {
     let battleDrawnCards = [];
     
     async function renderDuelPanel() {
-        let opponents = [];
-        try {
-            const res = await fetch(`${window.location.origin}/api/opponents`);
-            const data = await res.json();
-            if (data.success) opponents = data.data;
-        } catch (e) {}
+        // 对手数据直接写死
+        var opponents = [
+            {id:'cirno', name:'チルノ', hp:300, emoji:'❄️', reward:80},
+            {id:'reimu', name:'博麗霊夢', hp:600, emoji:'🧙‍♀️', reward:200},
+            {id:'yukari', name:'八雲紫', hp:999, emoji:'🦊', reward:500}
+        ];
         
-        if (window.Challenges) Challenges.updateProgress('learn_word', 1);
+        var html = '<div class="modal-header"><div class="modal-title" style="font-size:1.6em;color:var(--color-gold);text-align:center;">⚔️ 符卡对决 — 幻想乡武道会</div></div>';
+        html += '<div style="margin-bottom:15px;text-align:center;"><button class="btn btn-primary" onclick="Panels.showHandCards()">🎴 符卡存放 (' + battleDrawnCards.length + '/7)</button> <button class="btn btn-ghost" onclick="Panels.drawBattleCards()">🀄 抽取符卡</button></div>';
         
-        return `
-            <div class="modal-header">
-                <div class="modal-title" style="font-size:1.6em;color:var(--color-gold);text-align:center;">⚔️ 符卡对决 — 幻想乡武道会</div>
-                <div class="modal-subtitle" style="text-align:center;color:#887060;font-size:0.9em;">选择你的对手，用符卡之力击败他们！</div>
-            </div>
-            <div style="margin-bottom:15px;text-align:center;">
-                <button class="btn btn-primary" onclick="Panels.showHandCards()">🎴 符卡存放 (${battleDrawnCards.length}/7)</button>
-                <button class="btn btn-ghost" onclick="Panels.drawBattleCards()">🀄 抽取符卡</button>
-            </div>
-            <div class="opponent-select" id="opponentList">
-                ${opponents.map(o => `
-                    <div class="opponent-card" onclick="Panels.startBattle('${o.id}')">
-                        <span class="opponent-emoji">${o.emoji}</span>
-                        <div class="opponent-name">${o.name}</div>
-                        <div class="opponent-hp">❤️ HP: ${o.hp}</div>
-                        <div class="opponent-reward">💰 赏金: ${o.reward} 賽錢</div>
-                    </div>`).join('')}
-            </div>
-            <p style="text-align:center;color:#887060;font-size:0.8em;margin-top:10px;">需要先抽取符卡才能开始战斗</p>`;
+        for (var i = 0; i < opponents.length; i++) {
+            var o = opponents[i];
+            html += '<div class="opponent-card" id="opp_' + o.id + '"><span class="opponent-emoji">' + o.emoji + '</span><div class="opponent-name">' + o.name + '</div><div class="opponent-hp">❤️ HP: ' + o.hp + '</div><div class="opponent-reward">💰 赏金: ' + o.reward + ' 賽錢</div></div>';
+        }
+        
+        html += '<p style="text-align:center;color:#887060;font-size:0.8em;margin-top:10px;">需要先抽取符卡才能开始战斗</p>';
+        
+        // 用 setTimeout 绑定事件
+        setTimeout(function() {
+            var cards = document.querySelectorAll('.opponent-card');
+            for (var j = 0; j < cards.length; j++) {
+                cards[j].onclick = function() {
+                    var oppId = this.id.replace('opp_', '');
+                    var opp = null;
+                    for (var k = 0; k < opponents.length; k++) {
+                        if (opponents[k].id === oppId) { opp = opponents[k]; break; }
+                    }
+                    if (!opp) return;
+                    if (battleDrawnCards.length === 0) { Panels.showToast('💢', '请先抽取符卡', 'error'); return; }
+                    Battle.setOpponent(opp);
+                    Battle.setHandCards(battleDrawnCards.slice());
+                    renderBattleScreen(opp);
+                };
+            }
+        }, 500);
+        
+        return html;
     }
     
     async function drawBattleCards() {
@@ -233,13 +266,37 @@ const Panels = (() => {
             const data = await res.json();
             if (data.success) {
                 battleDrawnCards.push({...data.data, revealed: false, used: false});
+                Battle.setHandCards([...battleDrawnCards]);
                 Panels.showToast('🎴', `获得符卡：${data.data.word}`, 'success');
                 const body = document.getElementById('modalBody');
                 body.innerHTML = await renderDuelPanel();
+                
+                // 重新绑定事件
+                setTimeout(function() {
+                    var cards = document.querySelectorAll('.opponent-card');
+                    for (var i = 0; i < cards.length; i++) {
+                        cards[i].onclick = function() {
+                            var oppId = this.id.replace('opp_', '');
+                            var opponents = {
+                                'cirno': {id:'cirno', hp:300, emoji:'❄️'},
+                                'reimu': {id:'reimu', hp:600, emoji:'🧙‍♀️'},
+                                'yukari': {id:'yukari', hp:999, emoji:'🦊'}
+                            };
+                            var opp = opponents[oppId];
+                            if (!opp || battleDrawnCards.length === 0) {
+                                Panels.showToast('💢', '请先抽取符卡', 'error');
+                                return;
+                            }
+                            Battle.setOpponent(opp);
+                            Battle.setHandCards(battleDrawnCards.slice());
+                            renderBattleScreen(opp);
+                        };
+                    }
+                }, 500);
             }
         } catch (e) { Panels.showToast('💢', '抽取失败', 'error'); }
     }
-    
+        
     function showHandCards() {
         if (battleDrawnCards.length === 0) { Panels.showToast('💢', '手牌为空', 'error'); return; }
         const overlay = document.createElement('div');
@@ -263,17 +320,25 @@ const Panels = (() => {
     }
     
     function startBattle(opponentId) {
-        if (battleDrawnCards.length === 0) { Panels.showToast('💢', '请先抽取符卡', 'error'); return; }
-        fetch(`${window.location.origin}/api/opponents`).then(r => r.json()).then(data => {
-            if (!data.success) return;
-            const opponent = data.data.find(o => o.id === opponentId);
-            if (!opponent) return;
-            Battle.setOpponent(opponent);
-            Battle.handCards = [...battleDrawnCards];
-            renderBattleScreen(opponent);
-        });
+        if (battleDrawnCards.length === 0) {
+            Panels.showToast('💢', '请先抽取符卡', 'error');
+            return;
+        }
+        
+        var opponents = {
+            'cirno': {id:'cirno', hp:300, emoji:'❄️'},
+            'reimu': {id:'reimu', hp:600, emoji:'🧙‍♀️'},
+            'yukari': {id:'yukari', hp:999, emoji:'🦊'}
+        };
+        
+        var opp = opponents[opponentId];
+        if (!opp) return;
+        
+        Battle.setOpponent(opp);
+        Battle.setHandCards(battleDrawnCards.slice());
+        renderBattleScreen(opp);
     }
-    
+
     function renderBattleScreen(opponent) {
         const body = document.getElementById('modalBody');
         const cards = Battle.getHandCards();
@@ -478,7 +543,9 @@ const Panels = (() => {
         renderPanels, openModal, closeModal, refreshCard,
         buyItem, toggleDanmakuWord, checkDanmaku, resetDanmaku, newDanmaku,
         performBow, showToast,
-        drawBattleCards, showHandCards, startBattle, attackWithCard
+        drawBattleCards, showHandCards, startBattle, attackWithCard,
+        renderDuelPanel,renderBattleScreen,battleDrawnCards,
+
     };
 })();
 

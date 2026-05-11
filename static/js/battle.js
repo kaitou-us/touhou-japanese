@@ -96,6 +96,10 @@ const Battle = (() => {
         maxHP = 0;
         battleActive = false;
     }
+
+    function setHandCards(cards) {
+        handCards = cards;
+    }
     
     return {
         drawHandCards,
@@ -103,7 +107,8 @@ const Battle = (() => {
         setOpponent,
         useCard,
         resetBattle,
-        getDamage
+        getDamage,
+        setHandCards
     };
 })();
 
