@@ -42,6 +42,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadUserHeader();
         // 加载每日挑战
         await loadChallenges();
+        // 加载签到按钮
+        Signin.init();
     }
     
     console.log('✅ 初始化完成 - "言灵即是力量"');

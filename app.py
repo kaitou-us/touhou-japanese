@@ -808,6 +808,109 @@ def search_stats():
     
     return jsonify({"success": True, "data": stats})
 
+# ---------- 每日签到 ----------
+
+@app.route('/api/signin/status')
+def signin_status():
+    """获取签到状态"""
+    user_token = request.args.get('token', '')
+    data, user = get_or_create_user(user_token)
+    if not user:
+        return jsonify({"success": False, "message": "请先登录"}), 401
+    
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    last_signin = user.get('last_signin_date', '')
+    consecutive = user.get('signin_consecutive', 0)
+    
+    if last_signin == today:
+        return jsonify({
+            "success": True,
+            "signed_today": True,
+            "consecutive": consecutive,
+            "total": user.get('signin_total', 0)
+        })
+    
+    return jsonify({
+        "success": True,
+        "signed_today": False,
+        "consecutive": consecutive,
+        "total": user.get('signin_total', 0)
+    })
+
+
+@app.route('/api/signin', methods=['POST'])
+def do_signin():
+    """执行签到"""
+    user_token = request.json.get('token', '')
+    data, user = get_or_create_user(user_token)
+    if not user:
+        return jsonify({"success": False, "message": "请先登录"}), 401
+    
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    
+    if user.get('last_signin_date') == today:
+        return jsonify({"success": False, "message": "今天已经签到过了！"})
+    
+    # 检查连续签到
+    yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    if user.get('last_signin_date') == yesterday:
+        user['signin_consecutive'] = user.get('signin_consecutive', 0) + 1
+    else:
+        user['signin_consecutive'] = 1
+    
+    user['last_signin_date'] = today
+    user['signin_total'] = user.get('signin_total', 0) + 1
+    
+    # 奖励
+    consecutive = user['signin_consecutive']
+    if consecutive >= 30:
+        reward_rei = 5
+        reward_saisen = 500
+    elif consecutive >= 7:
+        reward_rei = 2
+        reward_saisen = 300
+    elif consecutive >= 3:
+        reward_rei = 1
+        reward_saisen = 150
+    else:
+        reward_rei = 0
+        reward_saisen = 100
+    
+    if 'currencies' not in user:
+        user['currencies'] = {'靈珠': 0, '賽錢': 0, '信仰ポイント': 0}
+    user['currencies']['靈珠'] = user['currencies'].get('靈珠', 0) + reward_rei
+    user['currencies']['賽錢'] = user['currencies'].get('賽錢', 0) + reward_saisen
+    
+    # 随机选择一张图片
+    image_path = BASE_DIR / 'static' / 'images' / 'signin'
+    images = list(image_path.glob('*.png')) + list(image_path.glob('*.jpg')) + list(image_path.glob('*.gif'))
+    random_image = random.choice(images).name if images else ''
+    
+    save_users_data(data)
+    
+    return jsonify({
+        "success": True,
+        "message": f"签到成功！连续签到第 {consecutive} 天",
+        "consecutive": consecutive,
+        "total": user['signin_total'],
+        "reward": {"rei": reward_rei, "saisen": reward_saisen},
+        "image": random_image
+    })
+
+@app.route('/api/signin/reset', methods=['POST'])
+def reset_signin():
+    """重置签到状态（仅供测试）"""
+    user_token = request.json.get('token', '')
+    data, user = get_or_create_user(user_token)
+    if not user:
+        return jsonify({"success": False, "message": "请先登录"}), 401
+    
+    user['last_signin_date'] = ''
+    user['signin_consecutive'] = 0
+    save_users_data(data)
+    return jsonify({"success": True, "message": "签到状态已重置"})
+
+
 
 
 # ==================== 错误处理 ====================

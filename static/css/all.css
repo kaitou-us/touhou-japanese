@@ -3559,4 +3559,86 @@ body {
     .hand-cards-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+}/* 签到按钮 */
+.signin-btn {
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: #3d2000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: var(--font-cn);
+    font-size: 0.95em;
+    font-weight: bold;
+    transition: all 0.3s;
+    margin: 8px;
+}
+
+.signin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,215,0,0.5);
+}
+
+.signin-btn:disabled {
+    background: #555;
+    color: #999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 签到弹窗 */
+.signin-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 250;
+    background: var(--bg-modal);
+    border: 3px solid #ffd700;
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(255,215,0,0.5);
+    animation: scaleIn 0.5s ease-out;
+    max-width: 400px;
+    width: 90%;
+}
+
+.signin-popup .signin-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 12px;
+    margin: 10px auto;
+    display: block;
+    border: 2px solid var(--border-gold);
+}
+
+.signin-popup .signin-title {
+    color: #ffd700;
+    font-size: 1.5em;
+    margin: 10px 0;
+}
+
+.signin-popup .signin-reward {
+    color: var(--text-primary);
+    font-size: 1.1em;
+    margin: 8px 0;
+}
+
+.signin-popup .signin-consecutive {
+    color: #ff8c00;
+    font-size: 0.95em;
+    margin: 4px 0;
+}
+
+.signin-popup .btn-close-popup {
+    margin-top: 15px;
+    padding: 10px 30px;
+    background: var(--color-gold);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
 }
