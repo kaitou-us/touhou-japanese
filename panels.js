@@ -337,6 +337,7 @@ const Panels = (() => {
         Battle.setOpponent(opp);
         Battle.setHandCards(battleDrawnCards.slice());
         renderBattleScreen(opp);
+        AudioManager.playBattleMusic(opponentId);
     }
 
     function renderBattleScreen(opponent) {
@@ -422,7 +423,7 @@ const Panels = (() => {
     function showVictoryPopup(rewardMsg) {
         const popup = document.createElement('div');
         popup.className = 'victory-popup';
-        popup.innerHTML = `<span class="victory-emoji">🎉</span><div class="victory-text">胜利！</div><p style="color:var(--text-primary);">${rewardMsg}</p><button class="btn btn-primary" style="margin-top:15px;" onclick="this.parentElement.remove(); Battle.resetBattle(); Panels.renderDuelPanel().then(h => document.getElementById('modalBody').innerHTML = h);">返回</button>`;
+        popup.innerHTML = '<span class="victory-emoji">🎉</span><div class="victory-text">胜利！</div><p>' + rewardMsg + '</p><button class="btn btn-primary" style="margin-top:15px;" onclick="AudioManager.stopAll(); AudioManager.playBGM(); this.parentElement.remove(); Panels.renderDuelPanel().then(function(h){document.getElementById(\'modalBody\').innerHTML=h;})">返回</button>';
         document.body.appendChild(popup);
     }
     

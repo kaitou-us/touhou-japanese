@@ -2865,10 +2865,12 @@ body {
 }
 
 .character-emoji-display {
-    font-size: 4em;
-    display: block;
-    margin-bottom: 10px;
-    animation: gentleFloat 2s ease-in-out infinite;
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
 }
 
 .character-name-display {

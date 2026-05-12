@@ -382,9 +382,8 @@ async function loadUserHeader() {
             // 更新头像为PNG
             var avatar = document.querySelector('.user-avatar');
             if (avatar) {
-               avatar.innerHTML = '<img src="' + user.character_emoji + '" style="width:50px;height:50px;object-fit:contain;">';
-            }
-                    
+               avatar.innerHTML = '<img src="/static/images/characters/' + user.character_id + '.png" style="width:50px;height:50px;object-fit:contain;">';
+            }      
             const els = {
                 username: document.getElementById('headerUsername'),
                 title: document.getElementById('headerTitle'),
