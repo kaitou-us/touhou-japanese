@@ -333,7 +333,37 @@ const Effects = (() => {
         scrollToTop,
         initBackToTop,
     };
-})();/**
+})();const AudioManager = (() => {
+    var current = null;
+    var victorySFX = null;  // 单独追踪胜利音效
+
+    function stopAll() {
+        if (current) { current.pause(); current.currentTime = 0; current = null; }
+        if (victorySFX) { victorySFX.pause(); victorySFX.currentTime = 0; victorySFX = null; }
+    }
+
+    function play(src, loop, vol) {
+        stopAll();
+        var a = new Audio(src);
+        a.loop = !!loop;
+        a.volume = vol || 0.4;
+        a.play().catch(function(){});
+        current = a;
+    }
+
+    function playBGM()    { play('/static/audio/bgm.mp3', true, 0.3); }
+    function playBattle(id){ play(id==='yukari'?'/static/audio/battle2.mp3':'/static/audio/battle1.mp3', true, 0.4); }
+    function playDamage() { new Audio('/static/audio/damage.mp3').play().catch(function(){}); }
+    function playVictory(){ 
+        var a = new Audio('/static/audio/victory.mp3');
+        a.volume = 0.5;
+        a.play().catch(function(){});
+        victorySFX = a;
+    }
+
+    return { playBGM, playBattleMusic:playBattle, playDamage, playVictory, stopAll };
+})();
+window.AudioManager = AudioManager;/**
  * 幻想郷 言霊修行帳 - 六大板块逻辑
  */
 
@@ -563,6 +593,8 @@ const Panels = (() => {
             var res = await fetch(window.location.origin + '/api/card/random/filtered?jlpt=' + jlpt);
             var data = await res.json();
             if (data.success) {
+                // 二次检查防止溢出
+                if (battleDrawnCards.length >= 7) { return; }
                 battleDrawnCards.push({word: data.data.word, reading: data.data.reading || '', meaning: data.data.meaning || '', rarity: data.data.rarity || 'R', revealed: false, used: false});
                 Panels.showToast('🎴', '获得符卡：' + data.data.word, 'success');
                 document.getElementById('modalBody').innerHTML = await renderDuelPanel();
@@ -594,6 +626,7 @@ const Panels = (() => {
         currentOpponentHP = currentOpponent.hp;
         currentOpponentMaxHP = currentOpponent.hp;
         currentCardIndex = 0;
+        AudioManager.playBattleMusic(opponentId);
         renderBattleScreen2();
     }
 
@@ -601,13 +634,16 @@ const Panels = (() => {
     function renderBattleScreen2() {
         var body = document.getElementById('modalBody');
         var opp = currentOpponent;
-        body.innerHTML = '<div class="modal-header"><div class="modal-title" style="font-size:1.4em;color:var(--color-gold);text-align:center;">⚔️ VS ' + opp.name + '</div></div>' +
-            '<div class="battle-arena"><div class="battle-opponent-zone">' +
-            '<img id="oppImage" src="/static/images/opponents/' + opp.id + '_normal.png" style="width:120px;height:auto;transition:0.3s;">' +
-            '<div style="color:var(--text-gold);">' + opp.name + '</div><div class="hp-bar-outer"><div class="hp-bar-inner" id="hpBar" style="width:' + (currentOpponentHP / currentOpponentMaxHP * 100) + '%"></div></div><div class="hp-text" id="hpText">❤️ ' + currentOpponentHP + ' / ' + currentOpponentMaxHP + '</div></div>' +
-            '<div class="battle-hand-zone"><div id="cardArea" style="text-align:center;min-height:120px;"></div>' +
-            '<div style="text-align:center;margin-top:20px;"><button class="btn btn-primary btn-lg" id="fightBtn" onclick="Panels.revealCard()">⚡ 战斗</button></div></div></div>' +
-            '<div style="text-align:center;margin-top:15px;"><button class="btn btn-ghost" onclick="Panels.renderDuelPanel().then(function(h){document.getElementById(\'modalBody\').innerHTML=h;})">🔙 返回</button></div>';
+        var html = '<div class="modal-header"><div class="modal-title" style="font-size:1.4em;color:var(--color-gold);text-align:center;">⚔️ VS ' + opp.name + '</div></div>';
+        html += '<div class="battle-arena"><div class="battle-opponent-zone">';
+        html += '<img id="oppImage" src="/static/images/opponents/' + opp.id + '_normal.png" style="width:120px;height:auto;transition:0.3s;">';
+        html += '<div style="color:var(--text-gold);">' + opp.name + '</div>';
+        html += '<div class="hp-bar-outer"><div class="hp-bar-inner" id="hpBar" style="width:' + (currentOpponentHP / currentOpponentMaxHP * 100) + '%"></div></div>';
+        html += '<div class="hp-text" id="hpText">❤️ ' + currentOpponentHP + ' / ' + currentOpponentMaxHP + '</div></div>';
+        html += '<div class="battle-hand-zone"><div id="cardArea" style="text-align:center;min-height:120px;"></div>';
+        html += '<div style="text-align:center;margin-top:20px;"><button class="btn btn-primary btn-lg" id="fightBtn" onclick="Panels.revealCard()">⚡ 战斗</button></div></div></div>';
+        html += '<div style="text-align:center;margin-top:15px;"><button class="btn btn-ghost" onclick="AudioManager.stopAll(); AudioManager.playBGM(); Panels.renderDuelPanel().then(function(h){document.getElementById(\'modalBody\').innerHTML=h;})">🔙 返回</button></div>';
+        body.innerHTML = html;
     }
 
     // 点击战斗按钮：随机弹出一张未使用的符卡（只显示汉字）
@@ -647,9 +683,10 @@ const Panels = (() => {
         card.used = true;
         // 显示假名
         document.getElementById('readingSpot').textContent = card.reading || card.word;
-        
+        // 扣除血量
         var damage = DAMAGE_MAP[card.rarity] || 50;
         currentOpponentHP = Math.max(0, currentOpponentHP - damage);
+        AudioManager.playDamage();
         // 更新血条
         document.getElementById('hpBar').style.width = (currentOpponentHP / currentOpponentMaxHP * 100) + '%';
         document.getElementById('hpText').textContent = '❤️ ' + currentOpponentHP + ' / ' + currentOpponentMaxHP;
@@ -682,7 +719,7 @@ const Panels = (() => {
         } else {
             var allUsed = battleDrawnCards.every(function(c) { return c.used; });
             if (allUsed) {
-                if (oppImage) oppImage.src = '/static/images/' + currentOpponent.id + '_angry.png';
+                if (oppImage) oppImage.src = '/static/images/opponents/' + currentOpponent.id + '_angry.png';
                 setTimeout(function() { endBattle(false); }, 1200);
             }
         }
@@ -693,6 +730,7 @@ const Panels = (() => {
         if (victory && oppEmoji) oppEmoji.style.filter = 'grayscale(1)';
         
         if (victory) {
+            AudioManager.playVictory(); 
             var rewardMsg = '';
             var token = localStorage.getItem('touhou_user_token');
             if (token) {
@@ -704,6 +742,7 @@ const Panels = (() => {
                     if (d.success) {
                         battleDrawnCards = battleDrawnCards.filter(function(c) { return !c.used; });
                         showVictoryPopup('获得 ' + d.reward + ' 賽錢！');
+                        AudioManager.playBGM(); 
                     }
                 });
             }
@@ -724,10 +763,10 @@ const Panels = (() => {
     function showVictoryPopup(rewardMsg) {
         var popup = document.createElement('div');
         popup.className = 'victory-popup';
-        popup.innerHTML = '<span class="victory-emoji">🎉</span><div class="victory-text">胜利！</div><p>' + rewardMsg + '</p><button class="btn btn-primary" style="margin-top:15px;" onclick="this.parentElement.remove();Panels.renderDuelPanel().then(function(h){document.getElementById(\'modalBody\').innerHTML=h;});">返回</button>';
+        popup.innerHTML = '<span class="victory-emoji">🎉</span><div class="victory-text">胜利！</div><p>' + rewardMsg + '</p><button class="btn btn-primary" style="margin-top:15px;" onclick="AudioManager.stopAll(); AudioManager.playBGM(); this.parentElement.remove(); Panels.renderDuelPanel().then(function(h){document.getElementById(\'modalBody\').innerHTML=h;})">返回</button>';
         document.body.appendChild(popup);
     }
-            
+                    
     // ==================== 3. 河童杂货铺 ====================
     
     async function renderShopPanel() {
@@ -909,7 +948,7 @@ const Inventory = (() => {
                 
                 <!-- 用户状态栏 -->
                 <div class="user-status-bar">
-                    <div class="user-avatar">${user.character_emoji || '🧙‍♀️'}</div>
+                    <div class="user-avatar"><img src="${user.character_emoji || '/static/images/characters/reimu.png'}" style="width:50px;height:50px;object-fit:contain;"></div>
                     <div class="user-info">
                         <div class="user-name">${user.display_name}</div>
                         <div class="user-title">${user.character_title} · Lv.${user.level}</div>
@@ -1860,7 +1899,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 加载签到按钮
         Signin.init();
     }
-    
+
+
+            
     console.log('✅ 初始化完成 - "言灵即是力量"');
 });
 
@@ -2022,7 +2063,7 @@ async function drawCharacter() {
             
             resultDiv.innerHTML = `
                 <div class="drawn-character-card">
-                    <span class="character-emoji-display">${currentCharacter.emoji}</span>
+                    <img src="${currentCharacter.emoji}" class="character-emoji-display" style="width:80px;height:80px;object-fit:contain;">
                     <div class="character-name-display">${currentCharacter.name}</div>
                     <div class="character-title-display">${currentCharacter.title}</div>
                     <div class="character-rarity-badge ${rarityClass}">${currentCharacter.rarity}</div>
@@ -2062,7 +2103,7 @@ function goToConfirm() {
         
         confirmContent.innerHTML = `
             <div class="drawn-character-card">
-                <span class="character-emoji-display">${currentCharacter.emoji}</span>
+                <img src="${currentCharacter.emoji}" class="character-emoji-display" style="width:80px;height:80px;object-fit:contain;">
                 <div class="character-name-display">${currentCharacter.name}</div>
                 <div class="character-rarity-badge ${rarityClass}">${currentCharacter.rarity}</div>
             </div>
@@ -2191,7 +2232,13 @@ async function loadUserHeader() {
         
         if (data.success) {
             const user = data.data;
-            
+
+            // 更新头像为PNG
+            var avatar = document.querySelector('.user-avatar');
+            if (avatar) {
+               avatar.innerHTML = '<img src="' + user.character_emoji + '" style="width:50px;height:50px;object-fit:contain;">';
+            }
+                    
             const els = {
                 username: document.getElementById('headerUsername'),
                 title: document.getElementById('headerTitle'),

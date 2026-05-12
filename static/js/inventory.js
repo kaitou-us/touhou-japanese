@@ -56,7 +56,7 @@ const Inventory = (() => {
                 
                 <!-- 用户状态栏 -->
                 <div class="user-status-bar">
-                    <div class="user-avatar">${user.character_emoji || '🧙‍♀️'}</div>
+                    <div class="user-avatar"><img src="${user.character_emoji || '/static/images/characters/reimu.png'}" style="width:50px;height:50px;object-fit:contain;"></div>
                     <div class="user-info">
                         <div class="user-name">${user.display_name}</div>
                         <div class="user-title">${user.character_title} · Lv.${user.level}</div>

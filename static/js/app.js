@@ -45,7 +45,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 加载签到按钮
         Signin.init();
     }
-    
+
+
+            
     console.log('✅ 初始化完成 - "言灵即是力量"');
 });
 
@@ -207,7 +209,7 @@ async function drawCharacter() {
             
             resultDiv.innerHTML = `
                 <div class="drawn-character-card">
-                    <span class="character-emoji-display">${currentCharacter.emoji}</span>
+                    <img src="${currentCharacter.emoji}" class="character-emoji-display" style="width:80px;height:80px;object-fit:contain;">
                     <div class="character-name-display">${currentCharacter.name}</div>
                     <div class="character-title-display">${currentCharacter.title}</div>
                     <div class="character-rarity-badge ${rarityClass}">${currentCharacter.rarity}</div>
@@ -247,7 +249,7 @@ function goToConfirm() {
         
         confirmContent.innerHTML = `
             <div class="drawn-character-card">
-                <span class="character-emoji-display">${currentCharacter.emoji}</span>
+                <img src="${currentCharacter.emoji}" class="character-emoji-display" style="width:80px;height:80px;object-fit:contain;">
                 <div class="character-name-display">${currentCharacter.name}</div>
                 <div class="character-rarity-badge ${rarityClass}">${currentCharacter.rarity}</div>
             </div>
@@ -376,7 +378,13 @@ async function loadUserHeader() {
         
         if (data.success) {
             const user = data.data;
-            
+
+            // 更新头像为PNG
+            var avatar = document.querySelector('.user-avatar');
+            if (avatar) {
+               avatar.innerHTML = '<img src="' + user.character_emoji + '" style="width:50px;height:50px;object-fit:contain;">';
+            }
+                    
             const els = {
                 username: document.getElementById('headerUsername'),
                 title: document.getElementById('headerTitle'),
