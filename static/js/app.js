@@ -205,6 +205,7 @@ async function drawCharacter() {
         
         if (data.success) {
             currentCharacter = data.data;
+            AudioManager.playVoice(currentCharacter.id); 
             const rarityClass = `rarity-${currentCharacter.rarity}-badge`;
             
             resultDiv.innerHTML = `
@@ -382,7 +383,8 @@ async function loadUserHeader() {
             // 更新头像为PNG
             var avatar = document.querySelector('.user-avatar');
             if (avatar) {
-                avatar.innerHTML = '<img src="' + user.character_emoji + '" style="width:50px;height:50px;object-fit:contain;">';
+                var charId = (user.character_emoji || '').split('/').pop().replace('.png', '');
+                avatar.innerHTML = '<img src="' + user.character_emoji + '" style="width:50px;height:50px;object-fit:contain;cursor:pointer;" onclick="AudioManager.playVoice(\'' + charId + '\')">';
             }      
             const els = {
                 username: document.getElementById('headerUsername'),

@@ -282,6 +282,64 @@ def culture():
     data = load_data()
     return jsonify({"success": True, "data": data.get('culture_points', []), "shrine_name": "博麗神社", "blessing": "愿幻想乡的众神保佑你。"})
 
+# ---------- 占卜系统 ----------
+
+@app.route('/api/fortune')
+def get_fortune():
+    """每日占卜"""
+    user_token = request.args.get('token', '')
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    
+    # 签文列表
+    fortunes = [
+        {"level": "大吉", "emoji": "🎊", "message": "今天是最幸运的一天！学习任何词汇都会事半功倍。", "reward": 100, "color": "#ff0000"},
+        {"level": "中吉", "emoji": "🎉", "message": "运势不错，抽卡时SSR概率小幅提升。", "reward": 60, "color": "#ff6600"},
+        {"level": "小吉", "emoji": "🍀", "message": "小有运气，今天的签到奖励会翻倍。", "reward": 40, "color": "#ffaa00"},
+        {"level": "吉", "emoji": "✨", "message": "平稳的一天，按部就班学习即可。", "reward": 30, "color": "#ffcc00"},
+        {"level": "末吉", "emoji": "🔔", "message": "运气一般，但坚持学习总会有收获。", "reward": 20, "color": "#88aa88"},
+        {"level": "凶", "emoji": "💢", "message": "今天可能会遇到一些困难，但不要放弃！", "reward": 10, "color": "#6666ff"},
+        {"level": "大凶", "emoji": "💀", "message": "运势不佳……但正是磨练意志的好时机。", "reward": 5, "color": "#444444"},
+    ]
+    
+    # 权重：大吉5%，中吉10%，小吉15%，吉25%，末吉20%，凶15%，大凶10%
+    weights = [5, 10, 15, 25, 20, 15, 10]
+    
+    fortune = random.choices(fortunes, weights=weights, k=1)[0]
+    
+    # 如果用户已登录，检查今日是否已占卜
+    already_done = False
+    if user_token:
+        data, user = get_or_create_user(user_token)
+        if user:
+            if user.get('last_fortune_date') == today:
+                # 返回今天已经占卜的结果
+                saved = user.get('saved_fortune', fortune)
+                return jsonify({"success": True, "data": saved, "already_done": True})
+            
+            # 保存占卜结果
+            user['last_fortune_date'] = today
+            user['saved_fortune'] = fortune
+            
+            # 发放奖励
+            if 'currencies' not in user:
+                user['currencies'] = {'靈珠': 0, '賽錢': 0, '信仰ポイント': 0}
+            user['currencies']['賽錢'] = user['currencies'].get('賽錢', 0) + fortune['reward']
+            
+            save_users_data(data)
+    
+    return jsonify({"success": True, "data": fortune, "already_done": False})
+
+@app.route('/api/fortune/reset', methods=['POST'])
+def reset_fortune():
+    user_token = request.json.get('token', '')
+    data, user = get_or_create_user(user_token)
+    if user:
+        user['last_fortune_date'] = ''
+        save_users_data(data)
+        return jsonify({"success": True, "message": "已重置，可以重新占卜"})
+    return jsonify({"success": False, "message": "请先登录"})
+
+
 # ==================== 用户系统 ====================
 
 @app.route('/api/user/character_pool')
@@ -909,6 +967,8 @@ def reset_signin():
     user['signin_consecutive'] = 0
     save_users_data(data)
     return jsonify({"success": True, "message": "签到状态已重置"})
+
+
 
 
 

@@ -25,20 +25,34 @@ const Challenges = (() => {
     /**
      * 更新任务进度
      */
-    async function updateProgress(taskType, amount = 1) {
-        const token = getToken();
-        if (!token) return;
+     async function updateProgress(taskType, amount = 1) {
+        var token = getToken();
+        if (!token) {
+            console.log('无token，跳过进度上报');
+            return;
+        }
         try {
-            await fetch(`${window.location.origin}/api/challenges/progress`, {
+            var res = await fetch(window.location.origin + '/api/challenges/progress', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: token, task_type: taskType, amount: amount })
             });
+            var data = await res.json();
+            console.log('进度上报结果:', taskType, data);
+            
+            // 上报成功后立即刷新挑战面板
+            if (data.success) {
+                var panel = document.getElementById('challengePanelContainer');
+                if (panel) {
+                    var html = await renderChallengePanel();
+                    panel.innerHTML = html;
+                }
+            }
         } catch (e) {
             console.log('上报进度失败:', e);
         }
     }
-    /**
+        /**
      * 领取奖励
      */
     async function claimReward(taskId) {
@@ -119,25 +133,21 @@ const Challenges = (() => {
      * 领取奖励并刷新
      */
 async function claimAndRefresh(taskId) {
-    var result = await claimReward(taskId);
+    const result = await claimReward(taskId);
     if (result && result.success) {
-        // 显示奖励
-        var rei = result.reward?.rei || 0;
-        var saisen = result.reward?.saisen || 0;
-        Panels.showToast('🎁', '领取成功！靈珠 +' + rei + ' 賽錢 +' + saisen, 'success');
+        Panels.showToast('🎁', '领取成功！ +' + (result.reward?.saisen || 0) + '賽錢', 'success');
         
-        // 刷新挑战面板
-        var panel = document.getElementById('challengePanelContainer');
+        // 立即刷新面板
+        const panel = document.getElementById('challengePanelContainer');
         if (panel) {
-            panel.innerHTML = await renderChallengePanel();
+            const html = await renderChallengePanel();
+            panel.innerHTML = html;
         }
         
-        // 刷新头部货币显示
+        // 刷新货币
         if (window.loadUserHeader) {
             await window.loadUserHeader();
         }
-    } else {
-        Panels.showToast('💢', result?.message || '领取失败', 'error');
     }
 }
     /**

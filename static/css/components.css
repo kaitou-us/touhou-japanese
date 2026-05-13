@@ -880,3 +880,68 @@
     font-size: 0.9em;
     animation: pulse 1.5s ease-in-out infinite;
 }
+
+
+.fortune-box {
+    text-align: center;
+    padding: 30px;
+    background: rgba(180,40,40,0.05);
+    border: 2px solid var(--border-gold);
+    border-radius: 12px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.fortune-box-icon {
+    font-size: 5em;
+    display: block;
+    animation: gentleFloat 3s ease-in-out infinite;
+}
+
+.fortune-box-icon.shaking {
+    animation: shake 0.3s ease-in-out infinite;
+}
+
+.fortune-emoji {
+    font-size: 4em;
+    display: block;
+    animation: scaleIn 0.5s ease-out;
+}
+
+.fortune-level {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 10px 0;
+    font-family: var(--font-jp);
+}
+
+.fortune-message {
+    color: var(--text-secondary);
+    font-size: 1em;
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+
+.stick-fly {
+    animation: stickFlyOut 0.8s ease-out forwards;
+}
+
+@keyframes stickFlyOut {
+    0% { bottom: 20px; opacity: 1; transform: translateX(-50%) rotate(0); }
+    100% { bottom: 200px; opacity: 0; transform: translateX(-50%) rotate(360deg); }
+}
+
+.fortune-box-img.shaking {
+    animation: shake 0.15s ease-in-out infinite;
+}
+
+@keyframes shake {
+    0%,100% { transform: translateX(0) rotate(0); }
+    25% { transform: translateX(-4px) rotate(-3deg); }
+    50% { transform: translateX(4px) rotate(3deg); }
+    75% { transform: translateX(-2px) rotate(-1deg); }
+}

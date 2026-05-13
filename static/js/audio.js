@@ -32,11 +32,17 @@ const AudioManager = (() => {
         current = audio;
     }
 
+    function playVoice(characterId) {
+        var a = new Audio('/static/audio/voices/' + characterId + '.m4a');
+        a.volume = 0.6;
+        a.play().catch(function(){});
+    }
+
     function playBGM()        { play(bgm); }
     function playBattle(id)   { play(id === 'yukari' ? battle2 : battle1); }
     function playDamage()     { damage.currentTime = 0; damage.play().catch(function(){}); }
     function playVictory()    { stopAll(); victory.currentTime = 0; victory.play().catch(function(){}); }
 
-    return { playBGM, playBattleMusic: playBattle, playDamage, playVictory, stopAll };
+    return { playBGM, playBattleMusic: playBattle, playDamage, playVictory, stopAll, playVoice };
 })();
 window.AudioManager = AudioManager;
