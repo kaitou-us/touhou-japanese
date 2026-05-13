@@ -334,34 +334,45 @@ const Effects = (() => {
         initBackToTop,
     };
 })();const AudioManager = (() => {
+    var bgm = new Audio('/static/audio/bgm.mp3');
+    bgm.loop = true; bgm.volume = 0.3;
+    
+    var battle1 = new Audio('/static/audio/battle1.mp3');
+    battle1.loop = true; battle1.volume = 0.4;
+    
+    var battle2 = new Audio('/static/audio/battle2.mp3');
+    battle2.loop = true; battle2.volume = 0.4;
+    
+    var damage = new Audio('/static/audio/damage.mp3');
+    damage.volume = 0.5;
+    
+    var victory = new Audio('/static/audio/victory.mp3');
+    victory.volume = 0.5;
+    
     var current = null;
-    var victorySFX = null;  // 单独追踪胜利音效
 
     function stopAll() {
-        if (current) { current.pause(); current.currentTime = 0; current = null; }
-        if (victorySFX) { victorySFX.pause(); victorySFX.currentTime = 0; victorySFX = null; }
+        bgm.pause(); bgm.currentTime = 0;
+        battle1.pause(); battle1.currentTime = 0;
+        battle2.pause(); battle2.currentTime = 0;
+        damage.pause(); damage.currentTime = 0;
+        victory.pause(); victory.currentTime = 0;
+        current = null;
     }
 
-    function play(src, loop, vol) {
+    function play(audio) {
         stopAll();
-        var a = new Audio(src);
-        a.loop = !!loop;
-        a.volume = vol || 0.4;
-        a.play().catch(function(){});
-        current = a;
+        audio.currentTime = 0;
+        audio.play().catch(function(){});
+        current = audio;
     }
 
-    function playBGM()    { play('/static/audio/bgm.mp3', true, 0.3); }
-    function playBattle(id){ play(id==='yukari'?'/static/audio/battle2.mp3':'/static/audio/battle1.mp3', true, 0.4); }
-    function playDamage() { new Audio('/static/audio/damage.mp3').play().catch(function(){}); }
-    function playVictory(){ 
-        var a = new Audio('/static/audio/victory.mp3');
-        a.volume = 0.5;
-        a.play().catch(function(){});
-        victorySFX = a;
-    }
+    function playBGM()        { play(bgm); }
+    function playBattle(id)   { play(id === 'yukari' ? battle2 : battle1); }
+    function playDamage()     { damage.currentTime = 0; damage.play().catch(function(){}); }
+    function playVictory()    { stopAll(); victory.currentTime = 0; victory.play().catch(function(){}); }
 
-    return { playBGM, playBattleMusic:playBattle, playDamage, playVictory, stopAll };
+    return { playBGM, playBattleMusic: playBattle, playDamage, playVictory, stopAll };
 })();
 window.AudioManager = AudioManager;/**
  * 幻想郷 言霊修行帳 - 六大板块逻辑
@@ -2236,9 +2247,8 @@ async function loadUserHeader() {
             // 更新头像为PNG
             var avatar = document.querySelector('.user-avatar');
             if (avatar) {
-               avatar.innerHTML = '<img src="' + user.character_emoji + '" style="width:50px;height:50px;object-fit:contain;">';
-            }
-                    
+               avatar.innerHTML = '<img src="/static/images/characters/' + user.character_id + '.png" style="width:50px;height:50px;object-fit:contain;">';
+            }      
             const els = {
                 username: document.getElementById('headerUsername'),
                 title: document.getElementById('headerTitle'),
