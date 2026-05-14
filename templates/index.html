@@ -15,14 +15,36 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
-
+    <script>
+    // 在页面最顶部立刻执行
+    if (window.AudioManager) { AudioManager.stopAll(); }
+    </script>
         <!-- 启动画面 -->
-    <div id="splashScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:linear-gradient(135deg, #1a0a0a 0%, #2c0a0a 100%);display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="this.style.display='none'; AudioManager.playBGM();">
+    <div id="splashScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000000;background:linear-gradient(135deg, #1a0a0a 0%, #2c0a0a 100%);
+        display:flex;align-items:center;justify-content:center;cursor:pointer;" 
+        onclick="this.style.display='none';
+        if(window.AudioManager) AudioManager.stopAll();
+        var v=document.getElementById('welcomeVideoPlayer'); 
+
+        if(v) {
+            if(!v.src || v.src===window.location.href) v.src='/static/video/welcome.mp4';
+            v.currentTime=0;
+            v.muted=false;
+            v.play().catch(function(){});
+            }
+
+        ">
         <div style="text-align:center;animation: scaleIn 0.8s ease-out;">
             <span style="font-size:5em;display:block;animation: gentleFloat 3s ease-in-out infinite;">⛩️</span>
             <h1 style="color:#d4a574;font-size:2em;letter-spacing:0.2em;margin:20px 0;font-family:var(--font-jp);">幻想郷へようこそ</h1>
             <p style="color:#887060;font-size:1.2em;animation: pulse 2s infinite;">点击进入幻想乡</p>
         </div>
+    </div>
+
+    <!-- 欢迎视频 -->
+    <div id="welcomeVideo" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:99997;background:#000;display:none;cursor:pointer;" onclick="skipWelcomeVideo()">
+    <video id="welcomeVideoPlayer" muted playsinline data-src="/static/video/welcome.mp4" style="width:100%;height:100%;object-fit:cover;"></video>
+        <div style="position:absolute;bottom:20px;right:20px;color:rgba(255,255,255,0.6);font-size:0.9em;">点击任意位置跳过</div>
     </div>
 
     <!-- ==================== 欢迎邀请函覆盖层 ==================== -->
@@ -97,6 +119,9 @@
             </button>
             <button class="nav-jlpt-btn" id="jlptToggleBtn" onclick="toggleJLPT()" title="切换JLPT单词">
                 📚
+            </button>
+            <button class="nav-bgm-btn" id="bgmToggleBtn" onclick="AudioManager.stopAll(); AudioManager.playEndingBGM();" title="结束BGM">
+                🌸
             </button>
         </div>
     </nav>
