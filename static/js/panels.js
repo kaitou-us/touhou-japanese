@@ -45,14 +45,51 @@ const Panels = (() => {
         overlay.classList.add('active');
         try {
             let content = '';
-            switch (id) { case 1: content = await renderCardPanel(); break; case 2: content = await renderDuelPanel(); break; case 3: content = await renderShopPanel(); break; case 4: content = await renderGrammarPanel(); break; case 5: content = await renderDanmakuPanel(); break; case 6: content = await renderCulturePanel(); break; default: content = '<p>未知的板块...</p>'; }
+            switch (id) { 
+                case 1: content = await renderCardPanel(); break;
+                case 2: content = await renderDuelPanel(); break; 
+                case 3: content = await renderShopPanel(); break; 
+                case 4: content = await renderGrammarPanel(); break; 
+                case 5: content = await renderDanmakuPanel(); break; 
+                case 6: content = await renderCulturePanel(); break; 
+                default: content = '<p>未知的板块...</p>'; }
             body.innerHTML = content;
+            if (id === 4) {
+            var idx = 0;
+            var grammars = [
+                {description: '日语的基本语序...', example_wrong: '我 吃 苹果', example_correct: '私は リンゴを 食べます', tip: '谓语永远在句末', formula: '主语 → は/が → 宾语 → を → 谓语'},
+                {description: '「〜たい」...', example_wrong: 'I want to go', example_correct: '私は 日本に 行きたいです', tip: '愿望表达', formula: '主语 → は → 目的地 → に → 动词+たい'},
+                {description: '「〜ている」...', example_wrong: 'I am studying', example_correct: '私は 勉強しています', tip: '进行时', formula: '主语 → は → 宾语 → を → 动词+ている'},
+                {description: '「〜たことがある」...', example_wrong: 'I have been to Japan', example_correct: '私は 日本に 行ったことがあります', tip: '经验表达', formula: '主语 → は → 场所 → に → 动词た形+ことがある'},
+                {description: '「〜なければならない」...', example_wrong: 'I must study', example_correct: '私は 勉強しなければなりません', tip: '义务表达', formula: '主语 → は → 宾语 → を → 动词否定形+ばならない'}
+            ];
+
+            window._grammarTimer = setInterval(function() {
+                idx = (idx + 1) % grammars.length;
+                var g = grammars[idx];
+                var descEl = document.getElementById('grammarDesc');
+                var exampleEl = document.getElementById('grammarExample');
+                var formulaEl = document.getElementById('grammarFormula');
+                var tipEl = document.getElementById('grammarTip');
+                var counterEl = document.getElementById('grammarCounter');
+                if (descEl) descEl.textContent = g.description;
+                if (exampleEl) exampleEl.innerHTML = '❌ <span style="color:#ff6b6b;text-decoration:line-through;">' + g.example_wrong + '</span> (SVO)<br>✅ <span style="color:#5a5;">' + g.example_correct + '</span> (SOV)';
+                if (formulaEl) formulaEl.textContent = g.formula;
+                if (tipEl) tipEl.textContent = g.tip;
+                if (counterEl) counterEl.textContent = '语法 ' + (idx+1) + '/5';
+            }, 5000);
+        }
             const danmakuZone = body.querySelector('.danmaku-zone');
             if (danmakuZone) Effects.createDanmakuEffect(danmakuZone, 5);
         } catch (error) { body.innerHTML = `<div class="modal-loading" style="color:#e74c3c;"><p>🏮 言灵之力不足...</p><p style="font-size:0.9em;">${error.message}</p></div>`; }
     }
 
-    function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); selectedWords = []; currentExerciseId = 1; }
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+        selectedWords = [];
+        currentExerciseId = 1;
+        if (window._grammarTimer) { clearInterval(window._grammarTimer); }
+    }
 
     // ==================== 1. 词汇符卡 ====================
     async function getFilteredRandomCard() { const jlpt = localStorage.getItem('jlpt_enabled')||'true'; const res = await fetch(`${window.location.origin}/api/card/random/filtered?jlpt=${jlpt}`); return res.json(); }
@@ -175,16 +212,343 @@ const Panels = (() => {
     async function renderShopPanel() { try { const result = await API.getShopItems(); const shop = result.data; const itemsHTML = shop.map(item => `<div class="shop-item"><div class="item-emoji">${item.icon}</div><div class="item-details"><div class="item-name">${item.name_jp}</div><div class="item-desc">${item.description} (${item.name_cn})</div></div><div class="item-price">¥${item.price}</div><button class="btn btn-sm btn-primary" onclick="Panels.buyItem('${item.name_jp}')">購入</button></div>`).join(''); return `<div class="modal-header"><div class="modal-title" style="font-size:1.6em;color:var(--color-gold);text-align:center;">🏮 河童杂货铺 — 买卖修行</div><div class="modal-subtitle" style="text-align:center;color:#887060;font-size:0.9em;">店主：${result.shopkeeper} · いらっしゃいませ！</div></div><p style="text-align:center;color:#d4a574;margin-bottom:15px;">💬 ${result.greeting}</p>${itemsHTML}<p id="buyResult" style="text-align:center;margin-top:15px;color:#d4a574;min-height:24px;"></p>`; } catch (error) { throw error; } }
     async function buyItem(itemName) { const token = localStorage.getItem('touhou_user_token')||''; try { const res = await fetch(`${window.location.origin}/api/shop/buy`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item_name:itemName,token})}); const data = await res.json(); const resultDiv = document.getElementById('buyResult'); if (resultDiv) { if (data.success) { resultDiv.innerHTML = `🛒 ${data.message}${data.balance!==undefined?' (剩余賽錢: '+data.balance+')':''}`; showToast('🛒',data.message,'success'); if(window.loadUserHeader) setTimeout(window.loadUserHeader,500); } else { resultDiv.innerHTML = `💢 ${data.message}`; showToast('💢',data.message,'error'); } } } catch (error) { showToast('💢','购买失败','error'); } }
 
-    // ==================== 4. 文法罗盘 ====================
-    async function renderGrammarPanel() { try { const result = await API.getGrammar(); const grammar = result.data[0]; return `<div class="modal-header"><div class="modal-title" style="font-size:1.6em;color:var(--color-gold);text-align:center;">🧭 迷路竹林文法罗盘</div><div class="modal-subtitle" style="text-align:center;color:#887060;font-size:0.9em;">Grammar Compass · 语序结构指引</div></div><p style="color:#d4a574;text-align:center;font-size:1.05em;">${grammar.description}</p><div style="text-align:center;font-size:1.2em;margin:20px 0;">❌ ${grammar.example_wrong} (SVO)<br>✅ ${grammar.example_correct} (SOV)</div><div class="compass-visual"><div class="compass-diagram"><div class="compass-pointer">🧭</div></div><div class="compass-formula">${grammar.formula}</div></div><p style="text-align:center;color:#b8956a;margin-top:15px;">${grammar.tip}</p><p style="text-align:center;color:#887060;">${result['compass_口诀']}</p>`; } catch (error) { throw error; } }
+    // ==================== 4. 文法罗盘（动态切换版） ====================
 
-    // ==================== 5. 弹幕洗练 ====================
-    async function renderDanmakuPanel() { try { const result = await API.getRandomDanmaku(); const exercise = result.data; currentExerciseId = exercise.id; selectedWords = []; const wordsHTML = exercise.shuffled_words.map(w => `<span class="danmaku-word-chip" data-word="${w}" onclick="Panels.toggleDanmakuWord(this)">${w}</span>`).join(''); return `<div class="modal-header"><div class="modal-title" style="font-size:1.6em;color:var(--color-gold);text-align:center;">💥 弹幕洗练 — 句子重组</div><div class="modal-subtitle" style="text-align:center;color:#887060;font-size:0.9em;">目标：${exercise.meaning}</div></div><p style="text-align:center;color:#b8956a;">按正确顺序点击散乱的弹幕词块：</p><div class="danmaku-zone" id="danmakuZone"><div class="danmaku-words-container" id="danmakuWords">${wordsHTML}</div><div class="danmaku-assembled-area" id="assembledArea"><span style="color:#887060;">← 点击上方词块拼出正确句子</span></div></div><div class="modal-footer"><button class="btn btn-primary" onclick="Panels.checkDanmaku()">✨ 洗练弹幕</button><button class="btn btn-ghost" onclick="Panels.resetDanmaku()">🔄 重置</button><button class="btn btn-ghost" onclick="Panels.newDanmaku()">🎲 换一题</button><p id="danmakuResult" style="margin-top:12px;min-height:24px;"></p></div>`; } catch (error) { throw error; } }
-    function toggleDanmakuWord(el) { const word = el.dataset.word; if (el.classList.contains('selected')) { el.classList.remove('selected'); selectedWords = selectedWords.filter(w => w !== word); } else { el.classList.add('selected'); selectedWords.push(word); } updateAssembledArea(); }
-    function updateAssembledArea() { const area = document.getElementById('assembledArea'); if (!area) return; area.className = 'danmaku-assembled-area'; area.innerHTML = selectedWords.length === 0 ? '<span style="color:#887060;">← 点击上方词块拼出正确句子</span>' : selectedWords.map(w => `<span class="danmaku-word-chip selected" style="cursor:default;animation:none;">${w}</span>`).join(''); }
-    async function checkDanmaku() { try { const res = await API.checkDanmaku(selectedWords, currentExerciseId); const result = document.getElementById('danmakuResult'); const area = document.getElementById('assembledArea'); if (result) { result.innerHTML = res.message; result.style.color = res.is_correct ? '#5a5' : '#e74c3c'; } if (area) { area.className = `danmaku-assembled-area ${res.is_correct ? 'correct' : 'wrong'}`; if (res.is_correct) Effects.refinementSuccessEffect(area); } } catch (error) { showToast('💢', '判定失败', 'error'); } }
-    function resetDanmaku() { selectedWords = []; document.querySelectorAll('.danmaku-word-chip.selected').forEach(w => w.classList.remove('selected')); updateAssembledArea(); const result = document.getElementById('danmakuResult'); if (result) result.innerHTML = ''; const area = document.getElementById('assembledArea'); if (area) area.className = 'danmaku-assembled-area'; }
-    async function newDanmaku() { const body = document.getElementById('modalBody'); body.innerHTML = '<div class="modal-loading"><div class="loading-spinner"></div></div>'; try { const content = await renderDanmakuPanel(); body.innerHTML = content; const danmakuZone = body.querySelector('.danmaku-zone'); if (danmakuZone) Effects.createDanmakuEffect(danmakuZone, 5); } catch (error) { body.innerHTML = '<p style="color:#e74c3c;text-align:center;">加载失败</p>'; } }
+    async function renderGrammarPanel() {
+        var grammars = [
+            { description: '日语的基本语序是主语(S)+宾语(O)+谓语(V)', example_wrong: '我 吃 苹果', example_correct: '私は リンゴを 食べます', tip: '谓语永远在句末，助词是指针', formula: '主语 → は/が → 宾语 → を → 谓语' },
+            { description: '「〜たい」表示愿望，"想做某事"', example_wrong: 'I want to go', example_correct: '私は 日本に 行きたいです', tip: '「〜たい」接在动词连用形后', formula: '主语 → は → 目的地 → に → 动词+たい' },
+            { description: '「〜ている」表示正在进行的动作或状态', example_wrong: 'I am studying', example_correct: '私は 勉強しています', tip: '「〜て+いる」变「〜ています」更礼貌', formula: '主语 → は → 宾语 → を → 动词+ている' },
+            { description: '「〜たことがある」表示曾经有过的经历', example_wrong: 'I have been to Japan', example_correct: '私は 日本に 行ったことがあります', tip: '动词た形+ことがある，表示经验', formula: '主语 → は → 场所 → に → 动词た形+ことがある' },
+            { description: '「〜なければならない」表示必须做某事', example_wrong: 'I must study', example_correct: '私は 勉強しなければなりません', tip: '否定形+ば+ならない，表示义务', formula: '主语 → は → 宾语 → を → 动词否定形+ばならない' }
+        ];
+        
+        var index = Math.floor(Math.random() * grammars.length);
+        var g = grammars[index];
+        
+        return `
+            <div class="modal-header">
+                <div class="modal-title" style="font-size:1.6em;color:var(--color-gold);text-align:center;">🧭 迷路竹林文法罗盘</div>
+                <div class="modal-subtitle" style="text-align:center;color:#887060;font-size:0.9em;" id="grammarCounter">语法 1/5</div>
+            </div>
+            <div class="grammar-video-wrapper">
+                <video autoplay loop muted playsinline>
+                    <source src="/static/video/grammar_bg.mp4" type="video/mp4">
+                </video>
+                <div class="grammar-overlay">
+                    <p style="color:#f0e6d3;text-align:center;font-size:1.05em;" id="grammarDesc">${g.description}</p>
+                    <div style="text-align:center;font-size:1.2em;margin:20px 0;" id="grammarExample">
+                        ❌ <span style="color:#ff6b6b;text-decoration:line-through;">${g.example_wrong}</span> (SVO)<br>
+                        ✅ <span style="color:#5a5;">${g.example_correct}</span>
+                    </div>
+                    <p style="color:#f0e6d3;text-align:center;" id="grammarFormula">${g.formula}</p>
+                </div>
+            </div>
+            <p style="text-align:center;color:#b8956a;" id="grammarTip">${g.tip}</p>
+        `;
+    }
+
+    // ==================== 5. 弹幕射击小游戏 ====================
+
+    let danmakuScore = 0;
+    let danmakuTarget = 10;
+    let danmakuActive = false;
+    let danmakuTimer = null;
+    let danmakuWords = [];
+    let danmakuMode = 'word';
+    let danmakuEnemyHP = 10;
+
+    async function renderDanmakuPanel() {
+        danmakuScore = 0;
+        danmakuEnemyHP = 10;
+        danmakuActive = false;
+        
+        var html = '<div class="modal-header"><div class="modal-title" style="font-size:1.6em;color:var(--color-gold);text-align:center;">💥 弹幕射击 — 言灵弹幕</div><div class="modal-subtitle" style="text-align:center;color:#887060;font-size:0.9em;">点击正确弹幕，击破敌人！</div></div>';
+        
+        // 模式选择
+        html += '<div style="text-align:center;margin-bottom:10px;">';
+        html += '<button class="btn btn-primary btn-sm" onclick="Panels.setDanmakuMode(\'word\')" id="modeWordBtn" style="margin:4px;">📝 单词模式</button>';
+        html += '<button class="btn btn-ghost btn-sm" onclick="Panels.setDanmakuMode(\'sentence\')" id="modeSentenceBtn" style="margin:4px;">📖 句子模式</button>';
+        html += '</div>';
+        
+        // 游戏区域
+        html += '<div id="danmakuGameArea" style="position:relative;width:100%;height:350px;background:rgba(0,0,0,0.4);border:2px solid var(--border-primary);border-radius:12px;overflow:hidden;cursor:crosshair;">';
+        
+        // 怪物（右侧）
+        html += '<div id="danmakuEnemy" style="position:absolute;right:20px;top:50%;transform:translateY(-50%);text-align:center;transition:all 0.3s;">';
+        html += '<img id="enemyImg" src="/static/images/opponents/cirno_normal.png" style="width:80px;height:auto;">';
+        html += '<div style="color:#e74c3c;font-size:0.8em;">HP: <span id="enemyHP">' + danmakuEnemyHP + '</span></div>';
+        html += '<div class="hp-bar-outer" style="width:60px;margin:4px auto;"><div class="hp-bar-inner" id="enemyHPBar" style="width:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);"></div></div>';
+        html += '</div>';
+        
+        // 自机（左侧）- 使用角色PNG
+        var playerImg = '/static/images/characters/reimu.png';
+        try {
+            var token = localStorage.getItem('touhou_user_token');
+            if (token) {
+                var pRes = await fetch('/api/user/profile?token=' + token);
+                var pData = await pRes.json();
+                if (pData.success && pData.data.character_emoji) {
+                    playerImg = pData.data.character_emoji;
+                }
+            }
+        } catch(e) {}
+        
+        html += '<div id="danmakuPlayer" style="position:absolute;left:30px;top:50%;transform:translateY(-50%);transition:all 0.2s;">';
+        html += '<img src="' + playerImg + '" style="width:60px;height:auto;">';
+        html += '</div>';
+        
+        html += '</div>';
+        
+        // 分数和按钮
+        html += '<div style="text-align:center;margin-top:12px;">';
+        html += '<span style="color:#ffd700;font-size:1.2em;">⭐ 积分: <strong id="danmakuScore">0</strong></span>';
+        html += '&nbsp;&nbsp;';
+        html += '<button class="btn btn-primary" id="danmakuStartBtn" onclick="Panels.startDanmakuGame()">🎮 开始游戏</button>';
+        html += '<button class="btn btn-ghost btn-sm" onclick="Panels.stopDanmakuGame()">⏹ 停止</button>';
+        html += '</div>';
+        
+        return html;
+    }
+
+    function setDanmakuMode(mode) {
+        danmakuMode = mode;
+        document.getElementById('modeWordBtn').className = (mode === 'word') ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+        document.getElementById('modeSentenceBtn').className = (mode === 'sentence') ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+    }
+
+    async function startDanmakuGame() {
+        danmakuScore = 0;
+        danmakuEnemyHP = 10;
+        danmakuActive = true;
+        document.getElementById('danmakuScore').textContent = '0';
+        document.getElementById('enemyHP').textContent = danmakuEnemyHP;
+        document.getElementById('enemyHPBar').style.width = '100%';
+        document.getElementById('danmakuStartBtn').disabled = true;
+        
+        // 加载单词
+        var jlpt = localStorage.getItem('jlpt_enabled') || 'true';
+        danmakuWords = [];
+        try {
+            var res = await fetch(window.location.origin + '/api/cards?jlpt=' + jlpt);
+            var data = await res.json();
+            if (data.success && data.data.length > 0) {
+                var shuffled = data.data.sort(function() { return 0.5 - Math.random(); });
+                danmakuWords = shuffled.slice(0, 30);
+            }
+        } catch(e) {
+            danmakuWords = [{word:'テスト', reading:'てすと', meaning:'测试'}, {word:'知識', reading:'ちしき', meaning:'知识'}, {word:'学校', reading:'がっこう', meaning:'学校'}];
+        }
+        
+        pickNewTarget();
+        spawnDanmaku();
+    }
+
+    function pickNewTarget() {
+        if (danmakuWords.length === 0) return;
+        var idx = Math.floor(Math.random() * danmakuWords.length);
+        var target = danmakuWords[idx];
+        var targetWord = (danmakuMode === 'word') ? target.word : (target.reading || target.word);
+        document.getElementById('danmakuEnemy').setAttribute('data-target', targetWord);
+
+        var player = document.getElementById('danmakuPlayer');
+        if (player) {
+            var hint = document.getElementById('targetHint');
+            if (!hint) {
+                hint = document.createElement('div');
+                hint.id = 'targetHint';
+                hint.style.cssText = 'position:absolute;top:-25px;left:50%;transform:translateX(-50%);color:#ffd700;font-size:0.8em;white-space:nowrap;';
+                player.appendChild(hint);
+            }
+                hint.textContent = '🎯 找: ' + targetWord;
+            }
+        }
+    
+
+    function spawnDanmaku() {
+        if (!danmakuActive) return;
+        var gameArea = document.getElementById('danmakuGameArea');
+        if (!gameArea) return;
+        
+        // 清除旧弹幕
+        gameArea.querySelectorAll('.danmaku-bullet').forEach(function(b) { b.remove(); });
+        
+        var targetWord = document.getElementById('danmakuEnemy').getAttribute('data-target') || '';
+        
+        // 生成4-6个弹幕，1个正确
+        var count = 4 + Math.floor(Math.random() * 3);
+        var correctPos = Math.floor(Math.random() * count);
+        
+        var distractors = [];
+        for (var i = 0; i < danmakuWords.length; i++) {
+            var w = (danmakuMode === 'word') ? danmakuWords[i].word : (danmakuWords[i].reading || danmakuWords[i].word);
+            if (w !== targetWord && w.length > 1) distractors.push(w);
+        }
+        distractors = distractors.sort(function() { return 0.5 - Math.random(); });
+        
+        for (var i = 0; i < count; i++) {
+            var bullet = document.createElement('div');
+            bullet.className = 'danmaku-bullet';
+            
+            var word;
+            if (i === correctPos) {
+                word = targetWord;
+                bullet.setAttribute('data-correct', 'true');
+            } else {
+                word = distractors[i % distractors.length] || '???';
+                bullet.setAttribute('data-correct', 'false');
+            }
+            
+            bullet.textContent = word;
+            bullet.setAttribute('data-word', word);
+            
+            var top = 30 + Math.random() * 280;
+            var size = 14 + Math.random() * 8;
+            var duration = 3 + Math.random() * 3;
+            
+            bullet.style.cssText = 
+                'position:absolute;' +
+                'left:100%;' +
+                'top:' + top + 'px;' +
+                'font-size:' + size + 'px;' +
+                'color:#ff6b6b;' +
+                'text-shadow:0 0 6px rgba(255,100,100,0.8);' +
+                'animation:danmakuFloat ' + duration + 's linear forwards;' +
+                'cursor:pointer;' +
+                'white-space:nowrap;' +
+                'z-index:10;' +
+                'user-select:none;';
+            
+            bullet.onclick = function(e) {
+                e.stopPropagation();
+                if (!danmakuActive) return;
+                
+                var isCorrect = this.getAttribute('data-correct') === 'true';
+                if (isCorrect) {
+                    hitTarget();
+                    gameArea.querySelectorAll('.danmaku-bullet').forEach(function(b) { b.remove(); });
+                    clearTimeout(danmakuTimer);
+                    if (danmakuActive) {
+                        pickNewTarget();
+                        danmakuTimer = setTimeout(function() { spawnDanmaku(); }, 600);
+                    }
+                } else {
+                    // 错误：弹幕闪红
+                    this.style.color = '#fff';
+                    this.style.textShadow = '0 0 12px #fff';
+                    setTimeout(function(b) { b.style.color = '#ff6b6b'; b.style.textShadow = '0 0 6px rgba(255,100,100,0.8)'; }, 200, this);
+                }
+            };
+            
+            gameArea.appendChild(bullet);
+        }
+        
+        // 弹幕循环：间隔后重新生成
+        danmakuTimer = setTimeout(function() {
+            gameArea.querySelectorAll('.danmaku-bullet').forEach(function(b) { b.remove(); });
+            if (danmakuActive) spawnDanmaku();
+        }, 4000);
+    }
+
+    function hitTarget() {
+        // 随机伤害 1-3
+        var damage = 1 + Math.floor(Math.random() * 3);
+        danmakuEnemyHP -= damage;
+        danmakuScore += damage;
+        
+        document.getElementById('danmakuScore').textContent = danmakuScore;
+        document.getElementById('enemyHP').textContent = Math.max(0, danmakuEnemyHP);
+        document.getElementById('enemyHPBar').style.width = (Math.max(0, danmakuEnemyHP) / 10 * 100) + '%';
+        
+        // 发射弹幕动画
+        firePlayerBullet();
+        
+        // 怪物受伤闪烁
+        var enemy = document.getElementById('danmakuEnemy');
+        enemy.style.filter = 'brightness(2)';
+        setTimeout(function() { enemy.style.filter = ''; }, 200);
+        
+        // 音效
+        if (window.AudioManager) AudioManager.playDamage();
+        
+        if (danmakuEnemyHP <= 0) {
+            danmakuActive = false;
+            clearTimeout(danmakuTimer);
+            
+            document.getElementById('enemyImg').style.filter = 'grayscale(1)';
+            document.getElementById('enemyHP').textContent = '0';
+            document.getElementById('enemyHPBar').style.width = '0%';
+            
+            var reward = danmakuScore * 100;  // 1:100 积分换賽錢
+            
+            setTimeout(function() {
+                // 发放奖励
+                var token = localStorage.getItem('touhou_user_token');
+                if (token) {
+                    fetch('/api/user/currencies/add', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({token: token, type: '賽錢', amount: reward})
+                    }).then(function(r){ return r.json(); }).then(function(d) {
+                        if (d.success) {
+                            showDanmakuResultPopup(danmakuScore, reward);
+                            if (window.loadUserHeader) setTimeout(window.loadUserHeader, 500);
+                        }
+                    });
+                } else {
+                    showDanmakuResultPopup(danmakuScore, reward);
+                }
+                document.getElementById('danmakuStartBtn').disabled = false;
+            }, 600);
+        }
+    }
+
+    function firePlayerBullet() {
+        var gameArea = document.getElementById('danmakuGameArea');
+        var player = document.getElementById('danmakuPlayer');
+        var enemy = document.getElementById('danmakuEnemy');
+        if (!gameArea || !player || !enemy) return;
+        
+        var bullet = document.createElement('div');
+        bullet.style.cssText = 
+            'position:absolute;' +
+            'left:' + (player.offsetLeft + 30) + 'px;' +
+            'top:' + (player.offsetTop + 25) + 'px;' +
+            'width:10px;height:10px;' +
+            'background:#ffd700;' +
+            'border-radius:50%;' +
+            'box-shadow:0 0 10px #ffd700;' +
+            'animation:playerShoot 0.4s linear forwards;' +
+            'z-index:20;pointer-events:none;';
+        gameArea.appendChild(bullet);
+        setTimeout(function() { bullet.remove(); }, 500);
+    }
+
+    function stopDanmakuGame() {
+        danmakuActive = false;
+        clearTimeout(danmakuTimer);
+        document.getElementById('danmakuStartBtn').disabled = false;
+        document.getElementById('danmakuScore').textContent = '0';
+        danmakuEnemyHP = 10;
+        document.getElementById('enemyHP').textContent = danmakuEnemyHP;
+        document.getElementById('enemyHPBar').style.width = '100%';
+        document.getElementById('enemyImg').style.filter = '';
+        var gameArea = document.getElementById('danmakuGameArea');
+        if (gameArea) gameArea.querySelectorAll('.danmaku-bullet').forEach(function(b) { b.remove(); });
+    }
+
+
+    function showDanmakuResultPopup(score, reward) {
+    var popup = document.createElement('div');
+    popup.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:300;background:var(--bg-modal);border:3px solid #ffd700;border-radius:16px;padding:30px;text-align:center;box-shadow:0 0 60px rgba(255,215,0,0.5);animation:scaleIn 0.5s ease-out;';
+    popup.innerHTML = 
+        '<span style="font-size:4em;display:block;">🎉</span>' +
+        '<div style="color:#ffd700;font-size:1.5em;margin:10px 0;">弹幕击破！</div>' +
+        '<p style="color:var(--text-primary);">⭐ 积分: <strong>' + score + '</strong></p>' +
+        '<p style="color:#ffd700;">💰 获得賽錢: <strong>' + reward + '</strong></p>' +
+        '<button class="btn btn-primary" style="margin-top:15px;" onclick="this.parentElement.remove();">确定</button>';
+    document.body.appendChild(popup);
+    }
 
     // ==================== 6. 神社占卜 ====================
     async function renderCulturePanel() {
@@ -216,11 +580,11 @@ const Panels = (() => {
 
     return {
         renderPanels, openModal, closeModal, refreshCard,
-        buyItem, toggleDanmakuWord, checkDanmaku, resetDanmaku, newDanmaku,
-        performBow, showToast,
+        buyItem, performBow, showToast,
         drawBattleCards, showHandCards, startBattle, revealCard, attackAndShowReading,
         renderDuelPanel, renderBattleScreen2, battleDrawnCards, currentOpponent, currentOpponentHP,
-        currentOpponentMaxHP, drawFortune, renderCulturePanel
+        currentOpponentMaxHP, drawFortune, renderCulturePanel,
+        setDanmakuMode, startDanmakuGame, stopDanmakuGame
     };
 })();
 window.Panels = Panels;

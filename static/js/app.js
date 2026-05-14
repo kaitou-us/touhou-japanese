@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const loginSuccess = await autoLogin(existingToken);
         if (loginSuccess) {
             document.getElementById('welcomeOverlay').style.display = 'none';
+            document.getElementById('welcomeVideo').style.display = 'none';
+            document.getElementById('splashScreen').style.display = 'none';
+            AudioManager.playBGM();// 登录成功，播放背景音乐
         } else {
             localStorage.removeItem('touhou_user_token');
             showWelcomeScreen();  // token无效，显示邀请函
@@ -158,22 +161,41 @@ window.quickAction = quickAction;
 let currentCharacter = null;
 
 function showWelcomeScreen() {
-    const overlay = document.getElementById('welcomeOverlay');
+    if (localStorage.getItem('touhou_user_token')) return;
+    if (window.AudioManager) AudioManager.stopAll();
+    document.getElementById('welcomeVideo').style.display = 'block';
+}
+
+function showInvitation() {
+    var overlay = document.getElementById('welcomeOverlay');
     if (!overlay) return;
-    
     overlay.style.display = 'block';
     overlay.style.opacity = '1';
-    
-    const stepDraw = document.getElementById('stepDraw');
-    const stepConfirm = document.getElementById('stepConfirm');
-    const drawResult = document.getElementById('drawResult');
-    
+    var stepDraw = document.getElementById('stepDraw');
+    var stepConfirm = document.getElementById('stepConfirm');
+    var drawResult = document.getElementById('drawResult');
     if (stepDraw) stepDraw.classList.add('active');
     if (stepConfirm) stepConfirm.classList.remove('active');
     if (drawResult) drawResult.innerHTML = '';
 }
 
+function skipWelcomeVideo() {
+    var v = document.getElementById('welcomeVideoPlayer');
+    if (v) v.pause();
+    document.getElementById('welcomeVideo').style.display = 'none';
+    showInvitation();
+}
+
+function welcomeVideoEnded() {
+    document.getElementById('welcomeVideo').style.display = 'none';
+    showInvitation();
+}
+
 async function drawCharacter() {
+    if (window.AudioManager && !window._bgmStarted){
+        AudioManager.playBGM();
+        window._bgmStarted = true;
+    }
     const btn = document.getElementById('drawBtn');
     const resultDiv = document.getElementById('drawResult');
     
@@ -355,6 +377,11 @@ async function autoLogin(token) {
         const data = await res.json();
         
         if (data.success) {
+            // 停止视频
+            var v = document.getElementById('welcomeVideoPlayer');
+            if (v) { v.pause(); v.muted = true; }
+            var vd = document.getElementById('welcomeVideo');
+            if (vd) { vd.style.display = 'none'; }
             setTimeout(() => {
                 if (window.Panels && Panels.showToast) {
                     Panels.showToast('🏮', data.message, 'success');
@@ -679,4 +706,10 @@ async function loadChallenges() {
             console.log('挑战面板加载失败:', e);
         }
     }
+}
+window.skipWelcomeVideo = skipWelcomeVideo;
+window.welcomeVideoEnded = welcomeVideoEnded;
+// 立即关闭BGM（如果欢迎视频存在）
+if (document.getElementById('welcomeVideo') && typeof AudioManager !== 'undefined') {
+    AudioManager.stopAll();
 }
