@@ -162,6 +162,7 @@ let currentCharacter = null;
 
 function showWelcomeScreen() {
     if (localStorage.getItem('touhou_user_token')) return;
+    if (!videoDiv) return;  // ← 加这行
     if (window.AudioManager) AudioManager.stopAll();
     document.getElementById('welcomeVideo').style.display = 'block';
 }
