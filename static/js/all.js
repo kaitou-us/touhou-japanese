@@ -2324,6 +2324,7 @@ async function autoLogin(token) {
                 if (window.Panels && Panels.showToast) {
                     Panels.showToast('🏮', data.message, 'success');
                 }
+            AudioManager.playBGM();
             }, 800);
             setTimeout(loadUserHeader, 1200);
             return true;
