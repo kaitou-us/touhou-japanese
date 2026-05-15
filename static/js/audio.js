@@ -26,7 +26,11 @@ const AudioManager = (() => {
 
     function playVictory() { stopAll(); var a = new Audio('/static/audio/victory.mp3'); a.volume = 0.5; a.play().catch(function(){}); }
 
-    function playVoice(cid) { var a = new Audio('/static/audio/voices/' + cid + '.m4a'); a.volume = 0.6; a.play().catch(function(){}); }
+    function playVoice(cid) { 
+        var a = new Audio('/static/audio/voices/' + cid + '.m4a'); 
+        a.volume = 1.4; 
+        a.play().catch(function(){}); 
+    }
 
     function playEndingBGM() {
         if (!ending) { ending = new Audio('/static/audio/ending.mp3'); ending.loop = false; ending.volume = 0.5; }
