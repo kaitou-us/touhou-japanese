@@ -361,7 +361,20 @@ const Effects = (() => {
 
     function playVictory() { stopAll(); var a = new Audio('/static/audio/victory.mp3'); a.volume = 0.5; a.play().catch(function(){}); }
 
-    function playVoice(cid) { var a = new Audio('/static/audio/voices/' + cid + '.m4a'); a.volume = 0.6; a.play().catch(function(){}); }
+    function playVoice(characterId) {
+        var a = new Audio('/static/audio/voices/' + characterId + '.m4a');
+        a.volume = 1.0;
+        
+        // 使用 AudioContext 增益
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var source = ctx.createMediaElementSource(a);
+        var gain = ctx.createGain();
+        gain.gain.value = 3.0;  // 放大3倍
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        
+        a.play().catch(function(){});
+    }
 
     function playEndingBGM() {
         if (!ending) { ending = new Audio('/static/audio/ending.mp3'); ending.loop = false; ending.volume = 0.5; }
